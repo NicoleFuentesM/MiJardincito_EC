@@ -1,0 +1,73 @@
+
+[
+{
+   "nombreComun":"Chuquiragua",
+   "nombreCientifico":"Chuquiraga jussieui",
+   "region":"Andes",
+   "altitudIdeal":3800,
+   "tipoClima":"Paramo"
+},
+{
+    "nombreComun":"Arrayan de Quito",
+    "nombreCientifico":"Myrcianthes hallii",
+    "region":"Andes",
+    "altitudIdeal":2800,
+    "tipoClima":"Templado"
+},
+{
+    "nombreComun":"Yagual",
+    "nombreCientifico":"Polylepis incana",
+    "region":"Andes",
+    "altitudIdeal":4000,
+    "tipoClima":"Paramo"
+},
+{
+    "nombreComun":"Guayacan",
+    "nombreCientifico":"Handroanthus chrysanthus",
+    "region":"Costa",
+    "altitudIdeal":200,
+    "tipoClima":"Seco Tropical"
+},
+{
+    "nombreComun":"Frailejon",
+    "nombreCientifico":"Espeletia pycnophylla",
+    "region":"Andes",
+    "altitudIdeal":3700,
+    "tipoClima":"Paramo"
+},
+{
+    "nombreComun":"Cascarilla",
+    "nombreCientifico":"Cinchona officinalis",
+    "region":"Andes",
+    "altitudIdeal":2000,
+    "tipoClima":"Bosque Nublado"
+},
+{
+    "nombreComun":"Pumamaqui",
+    "nombreCientifico":"Oreopanax ecuadorensis",
+    "region":"Andes",
+    "altitudIdeal":2800,
+    "tipoClima":"Templado"
+},
+{
+    "nombreComun":"Ceibo",
+    "nombreCientifico":"Ceiba trichistandra",
+    "region":"Costa",
+    "altitudIdeal":50,
+    "tipoClima":"Seco Tropical"
+},
+{
+    "nombreComun":"Balsa",
+    "nombreCientifico":"Ochroma pyramidale",
+    "region":"Costa",
+    "altitudIdeal":200,
+    "tipoClima":"Humedo Tropical"
+},
+{
+    "nombreComun":"Guayusa",
+    "nombreCientifico":"Ilex guayusa",
+    "region":"Amazonia",
+    "altitudIdeal":400,
+    "tipoClima":"Humedo Tropical"
+}
+]
