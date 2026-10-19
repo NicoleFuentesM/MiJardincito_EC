@@ -53,8 +53,22 @@ int main(){
     std::cout << "PROBANDO CAPA DE DATOS (JSON -> JARDIN)" << std::endl;
     //1. Invocar el cargador para parsear e inyectar las plantas
     CargadorJSON::cargarPlantas(miJardin, rutaJson);
+    //2. simular coordenadas/ubicación
+    int altitudUsuario=2800;
+    std::string climaUsuario="Templado";
+    std::cout << "\nBuscando plantas compatibles para: " << altitudUsuario
+    << " msnm (" << climaUsuario << ")...\n" << std::endl;
+    //3.ejecutar algoritmo de filtrado
+    std::vector<PlantaNativa> resultado = miJardin.buscarPlantasCompatibles(altitudUsuario, climaUsuario);
+    //4.desplegar resultados
+    std::cout << "Especies compatibles encontradas: " << resultado.size() << "\n" << std::endl;
+        for (const auto& planta : resultado) {
+            planta.mostrarFicha();
+            std::cout << "----------------------" << std::endl;
+        }
+    /*
     //mostrar la lista de plantas recuperada de vector
-    miJardin.verJardincito();
+    miJardin.verJardincito();*/
     
     return 0;
 }

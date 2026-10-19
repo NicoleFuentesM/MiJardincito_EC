@@ -21,6 +21,7 @@ public:
     void agregarPlanta(const PlantaNativa&);
     void verJardincito() const;
     const std::vector<PlantaNativa>& obtenerTodasLasPlantas() const;
+    std::vector<PlantaNativa> buscarPlantasCompatibles(int, const std::string&) const;
 };
 
 #endif

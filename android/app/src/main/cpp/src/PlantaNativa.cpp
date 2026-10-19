@@ -6,6 +6,7 @@
 //
 #include "PlantaNativa.h"
 #include <iostream>
+#include <cmath>
 
 
 PlantaNativa::PlantaNativa(std::string comun, std::string cientifico, std::string reg, int altitud, std::string clima)
@@ -56,5 +57,12 @@ bool PlantaNativa::sobreviveEnAltitud(int altitud_usuario) const
     }*/
     
     return(altitud_usuario>=limiteInferior && altitud_usuario<=limiteSuperior);
+}
+bool PlantaNativa::esCompatible(int altitudUsuario, const std::string& climaUsuario) const
+{
+    bool altitudValida=std::abs(altitudIdeal-altitudUsuario) <= 500;
+    bool climaValido = (tipoClima==climaUsuario);
+    
+    return altitudValida && climaValido;
 }
 

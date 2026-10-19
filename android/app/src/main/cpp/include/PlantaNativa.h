@@ -26,6 +26,7 @@ public:
     void mostrarFicha() const;
     //método para altitud-supervivencia de la plantita
     bool sobreviveEnAltitud(int) const;
+    bool esCompatible(int, const std::string&) const;
 };
 
 #endif

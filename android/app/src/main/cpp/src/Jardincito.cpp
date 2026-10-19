@@ -38,3 +38,15 @@ const std::vector<PlantaNativa>& Jardincito:: obtenerTodasLasPlantas() const
 {
     return coleccionPlantas;
 }
+std::vector<PlantaNativa> Jardincito:: buscarPlantasCompatibles(int altitud, const std::string& clima) const
+{
+    std::vector<PlantaNativa> compatibles;
+    for (const auto& planta:coleccionPlantas)
+    {
+        if (planta.esCompatible(altitud,clima))
+        {
+            compatibles.push_back(planta);
+        }
+    }
+    return compatibles;
+}
