@@ -65,4 +65,8 @@ bool PlantaNativa::esCompatible(int altitudUsuario, const std::string& climaUsua
     
     return altitudValida && climaValido;
 }
+std::string PlantaNativa::getNombreCientifico() const
+{
+    return nombreCientifico;
+}
 
