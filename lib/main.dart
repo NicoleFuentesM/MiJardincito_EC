@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
+import 'screens/quiz_screen.dart';
 
 void main() {
-  runApp(const JardincitoApp());
+  runApp(const MiJardincitoApp());
 }
 
-class JardincitoApp extends StatelessWidget {
-  const JardincitoApp({super.key});
+class MiJardincitoApp extends StatelessWidget {
+  const MiJardincitoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Jardincito EC',
-      home: Scaffold(
-        appBar: AppBar(title: const Text('Jardincito EC - Base Lista')),
-        body: const Center(
-          child: Text('¡Estructura de Flutter funcionando!'),
-        ),
+      title: 'Mi Jardincito EC',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
       ),
+      home: const QuizScreen(),
     );
   }
 }
