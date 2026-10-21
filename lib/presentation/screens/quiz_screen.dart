@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/planta_model.dart';
+import '../../models/planta_model.dart';
 
 class QuizScreen extends StatefulWidget {
   const QuizScreen({super.key});
