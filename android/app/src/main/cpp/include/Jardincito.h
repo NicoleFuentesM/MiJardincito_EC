@@ -1,28 +1,32 @@
-//
-//  Jadincito.h
-//  MyTool
-//
-//  Created by Nicole Rafaela Fuentes Manosalvas on 10/18/26.
-//
-
 #ifndef JARDINCITO_H
 #define JARDINCITO_H
 
 #include "PlantaNativa.h"
-#include <vector> //librería de c++ para arreglos dinámicos, arreglo crecerá y maneja la memoria por nosotros
+#include <vector>
+#include <string>
 
-class Jardincito{
+class Jardincito {
 private:
-    std::vector<PlantaNativa> coleccionPlantas;
+    std::vector<PlantaNativa> listaPlantas;
+
 public:
-    //constructor por defecto
-    Jardincito()=default;
-    //métodos para interactuar con la colleción
-    void agregarPlanta(const PlantaNativa&);
-    void verJardincito() const;
-    const std::vector<PlantaNativa>& obtenerTodasLasPlantas() const;
-    std::vector<PlantaNativa> buscarPlantasCompatibles(int, const std::string&) const;
+    Jardincito();
+
+    void agregarPlanta(const PlantaNativa& planta);
+    std::vector<PlantaNativa> getListaPlantas() const;
+
+    // Búsqueda básica
+    std::vector<PlantaNativa> buscarPlantasCompatibles(int altitudUsuario, const std::string& climaUsuario) const;
+
+    // Búsqueda multicriterio (Día 4)
+    std::vector<PlantaNativa> buscarPlantasCompatiblesAvanzado(
+        int altitudUsuario,
+        const std::string& climaUsuario,
+        const std::string& tipoPlantaUsuario,
+        const std::string& colorUsuario
+    ) const;
+    // Nuevo módulo: Lógica de colección e insignias del Jardín Virtual
+        std::string generarReporteColeccion(const std::vector<std::string>& nombresColeccionados) const;
 };
 
-#endif
-
+#endif // JARDINCITO_H

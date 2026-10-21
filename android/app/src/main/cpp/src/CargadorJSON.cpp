@@ -1,42 +1,52 @@
-//
-//  CargadorJSON.cpp
-//  MyTool
-//
-//  Created by Nicole Rafaela Fuentes Manosalvas on 10/19/26.
-//
-
 #include "CargadorJSON.h"
 #include "json.hpp"
-#include <fstream> //librería que permite que los datos persistan al cerrar el programa. Manejo y getión de archivos.
+#include <fstream>
 #include <iostream>
 
-//alias para no escribir nlohmann::json todo el tiempo
-using json=nlohmann::json;
+using json = nlohmann::json;
 
-void CargadorJSON::cargarPlantas(Jardincito& jardin, const std::string& rutaArchivo)
-{
-   //1. abrir el archivo
+void CargadorJSON::cargarPlantas(Jardincito& jardin, const std::string& rutaArchivo) {
     std::ifstream archivo(rutaArchivo);
-    // validar que exista el archivo y se pueda abrir
-    if(!archivo.is_open()){
-        std::cerr << "Error: No se pudo abrir el archivo de datos: " << rutaArchivo << std::endl;
+    if (!archivo.is_open()) {
+        std::cerr << "Error al abrir el archivo JSON: " << rutaArchivo << std::endl;
         return;
     }
-    //2. Parsear el Json
-    json datosJson;
-    archivo >> datosJson; //pasa a formato json automáticamente
-    //3. iterar sobre el arreglo de plantas del archivo
-    for (const auto& item:datosJson){
-        //extraer los valores mapeando las llaves exactas que se puso en plantas
-        PlantaNativa nuevaPlanta(
-                                 item["nombreComun"],
-                                 item["nombreCientifico"],
-                                 item["region"],
-                                 item["altitudIdeal"],
-                                 item["tipoClima"]
-                                 );
-        //agregar al repositorio
-        jardin.agregarPlanta(nuevaPlanta);
+
+    json datos;
+    archivo >> datos;
+
+    for (const auto& item : datos) {
+        std::string nComun = item.value("nombreComun", "");
+        std::string nCientifico = item.value("nombreCientifico", "");
+        std::string region = item.value("region", "");
+        int altitud = item.value("altitudIdeal", 0);
+        std::string clima = item.value("tipoClima", "");
+        std::string tipo = item.value("tipoPlanta", "");
+        std::string color = item.value("color", "");
+
+        PlantaNativa planta(nComun, nCientifico, region, altitud, clima, tipo, color);
+        jardin.agregarPlanta(planta);
     }
-    std::cout << "Se cargaron " << datosJson.size() << " plantas desde la base de datos. " << std::endl;
+}
+
+void CargadorJSON::cargarPlantasDesdeString(Jardincito& jardin, const std::string& jsonContenido) {
+    if (jsonContenido.empty()) return;
+
+    try {
+        json datos = json::parse(jsonContenido);
+        for (const auto& item : datos) {
+            std::string nComun = item.value("nombreComun", "");
+            std::string nCientifico = item.value("nombreCientifico", "");
+            std::string region = item.value("region", "");
+            int altitud = item.value("altitudIdeal", 0);
+            std::string clima = item.value("tipoClima", "");
+            std::string tipo = item.value("tipoPlanta", "");
+            std::string color = item.value("color", "");
+
+            PlantaNativa planta(nComun, nCientifico, region, altitud, clima, tipo, color);
+            jardin.agregarPlanta(planta);
+        }
+    } catch (const json::parse_error& e) {
+        std::cerr << "Error al parsear la cadena JSON: " << e.what() << std::endl;
+    }
 }

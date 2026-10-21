@@ -6,11 +6,13 @@
 #include "Jardincito.h"
 #include <string>
 
-class CargadorJSON{
-  
+class CargadorJSON {
 public:
-    //método estático: no se necesita crear un método cargador para usarlo
-    static void cargarPlantas(Jardincito&, const std::string&);
+    // Carga desde archivo local (útil para pruebas en Xcode/Desktop)
+    static void cargarPlantas(Jardincito& jardin, const std::string& rutaArchivo);
+
+    // Carga desde una cadena en memoria (usado por Flutter/Android)
+    static void cargarPlantasDesdeString(Jardincito& jardin, const std::string& jsonContenido);
 };
 
-#endif
+#endif // CARGADORJSON_H

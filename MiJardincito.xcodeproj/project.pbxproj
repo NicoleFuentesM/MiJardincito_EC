@@ -26,6 +26,7 @@
 		9024E31E3086C23C00DD93D0 /* PlantaNativa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PlantaNativa.cpp; sourceTree = "<group>"; };
 		906FE1433087CE9900DE29F7 /* jardincito_bridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = jardincito_bridge.h; sourceTree = "<group>"; };
 		906FE1443087D03C00DE29F7 /* jardincito_bridge.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = jardincito_bridge.cpp; sourceTree = "<group>"; };
+		90A5F0463089187000D0FE6B /* plantas.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = plantas.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +43,7 @@
 			children = (
 				9024E31A3086C23C00DD93D0 /* include */,
 				9024E31F3086C23C00DD93D0 /* src */,
+				90A5F0473089187000D0FE6B /* data */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -78,6 +80,14 @@
 			);
 			name = src;
 			path = android/app/src/main/cpp/src;
+			sourceTree = "<group>";
+		};
+		90A5F0473089187000D0FE6B /* data */ = {
+			isa = PBXGroup;
+			children = (
+				90A5F0463089187000D0FE6B /* plantas.json */,
+			);
+			path = data;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

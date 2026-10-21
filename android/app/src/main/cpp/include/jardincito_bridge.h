@@ -1,25 +1,30 @@
-//
-//  jardincito_bridge.h
-//  MyTool
-//
-//  Created by Nicole Rafaela Fuentes Manosalvas on 10/20/26.
-//
-
-#ifndef JARDIN_BRIDGE_H
-#define JARDIN_BRIDGE_H
+#ifndef JARDINCITO_BRIDGE_H
+#define JARDINCITO_BRIDGE_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Exporta la función para que Flutter/Dart consulte las plantas compatibles en JSON
-const char* obtenerPlantasCompatiblesJSON(int altitud, const char* clima);
+// Exporta la función multicriterio para Dart FFI recibiendo los 4 filtros y la base de datos JSON en memoria
+const char* obtenerPlantasCompatiblesAvanzadoJSON(
+    int altitud,
+    const char* clima,
+    const char* tipoPlanta,
+    const char* color,
+    const char* jsonBaseDatos
+);
 
-// Función para liberar la memoria dinámica asignada por la cadena devuelta
+// Nueva función expuesta para calcular las estadísticas del Jardín Virtual
+const char* obtenerProgresoColeccionJSON(
+    const char* jsonColeccionadas,
+    const char* jsonBaseDatos
+);
+
+// Liberación de memoria asignada en el heap de C++
 void liberarCadena(char* ptr);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // JARDIN_BRIDGE_H
+#endif // JARDINCITO_BRIDGE_H
