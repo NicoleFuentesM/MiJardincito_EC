@@ -1,24 +1,61 @@
 import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
+
 import 'package:ffi/ffi.dart';
+import 'package:flutter/services.dart';
+
 import '../models/planta.dart';
 
-// Definición de firmas C
-typedef ObtenerPlantasC = Pointer<Utf8> Function(Int32 altitud, Pointer<Utf8> clima);
+typedef ObtenerPlantasCompatiblesAvanzadoC = Pointer<Utf8> Function(
+  Int32 altitud,
+  Pointer<Utf8> clima,
+  Pointer<Utf8> tipoPlanta,
+  Pointer<Utf8> color,
+  Pointer<Utf8> jsonBaseDatos,
+);
+typedef ObtenerProgresoColeccionC = Pointer<Utf8> Function(
+  Pointer<Utf8> jsonColeccionadas,
+  Pointer<Utf8> jsonBaseDatos,
+);
 typedef LiberarCadenaC = Void Function(Pointer<Utf8> ptr);
 
-// Definición de firmas Dart
-typedef ObtenerPlantasDart = Pointer<Utf8> Function(int altitud, Pointer<Utf8> clima);
+typedef ObtenerPlantasCompatiblesAvanzadoDart = Pointer<Utf8> Function(
+  int altitud,
+  Pointer<Utf8> clima,
+  Pointer<Utf8> tipoPlanta,
+  Pointer<Utf8> color,
+  Pointer<Utf8> jsonBaseDatos,
+);
+typedef ObtenerProgresoColeccionDart = Pointer<Utf8> Function(
+  Pointer<Utf8> jsonColeccionadas,
+  Pointer<Utf8> jsonBaseDatos,
+);
 typedef LiberarCadenaDart = void Function(Pointer<Utf8> ptr);
 
-class NativeBridge {
+abstract interface class MotorJardin {
+  Future<List<Planta>> obtenerPlantasCompatiblesAvanzado(
+    int altitud,
+    String clima,
+    String tipoPlanta,
+    String color,
+  );
+
+  Future<Map<String, dynamic>> obtenerProgresoColeccion(
+    List<String> nombresColeccionadas,
+  );
+
+  Future<List<Planta>> cargarCatalogo();
+}
+
+class NativeBridge implements MotorJardin {
   late final DynamicLibrary _dylib;
-  late final ObtenerPlantasDart _obtenerPlantas;
+  late final ObtenerPlantasCompatiblesAvanzadoDart
+  _obtenerPlantasCompatiblesAvanzado;
+  late final ObtenerProgresoColeccionDart _obtenerProgresoColeccion;
   late final LiberarCadenaDart _liberarCadena;
 
   NativeBridge() {
-    // Carga de la biblioteca compilada según plataforma
     if (Platform.isMacOS || Platform.isIOS) {
       _dylib = DynamicLibrary.process();
     } else if (Platform.isAndroid) {
@@ -29,38 +66,108 @@ class NativeBridge {
       _dylib = DynamicLibrary.process();
     }
 
-    _obtenerPlantas = _dylib
-        .lookup<NativeFunction<ObtenerPlantasC>>('obtenerPlantasCompatiblesJSON')
-        .asFunction<ObtenerPlantasDart>();
+    _obtenerPlantasCompatiblesAvanzado = _dylib
+        .lookup<NativeFunction<ObtenerPlantasCompatiblesAvanzadoC>>(
+          'obtenerPlantasCompatiblesAvanzadoJSON',
+        )
+        .asFunction<ObtenerPlantasCompatiblesAvanzadoDart>();
+
+    _obtenerProgresoColeccion = _dylib
+        .lookup<NativeFunction<ObtenerProgresoColeccionC>>(
+          'obtenerProgresoColeccionJSON',
+        )
+        .asFunction<ObtenerProgresoColeccionDart>();
 
     _liberarCadena = _dylib
         .lookup<NativeFunction<LiberarCadenaC>>('liberarCadena')
         .asFunction<LiberarCadenaDart>();
   }
 
-  List<Planta> obtenerPlantasCompatibles(int altitud, String clima) {
+  @override
+  Future<List<Planta>> obtenerPlantasCompatiblesAvanzado(
+    int altitud,
+    String clima,
+    String tipoPlanta,
+    String color,
+  ) async {
+    final jsonBaseDatos = await _cargarBaseDatos();
     final climaPointer = clima.toNativeUtf8();
+    final tipoPlantaPointer = tipoPlanta.toNativeUtf8();
+    final colorPointer = color.toNativeUtf8();
+    final jsonBaseDatosPointer = jsonBaseDatos.toNativeUtf8();
 
     try {
-      // 1. Invocar función nativa de C++
-      final resultadoPointer = _obtenerPlantas(altitud, climaPointer);
-
-      if (resultadoPointer == nullptr) {
-        return [];
-      }
-
-      // 2. Leer la cadena UTF-8 en Dart
-      final jsonString = resultadoPointer.toDartString();
-
-      // 3. Liberar la memoria asignada en C++ para evitar memory leaks
-      _liberarCadena(resultadoPointer);
-
-      // 4. Deserializar el JSON
-      final List<dynamic> listaJson = jsonDecode(jsonString);
-      return listaJson.map((item) => Planta.fromJson(item)).toList();
+      final resultadoPointer = _obtenerPlantasCompatiblesAvanzado(
+        altitud,
+        climaPointer,
+        tipoPlantaPointer,
+        colorPointer,
+        jsonBaseDatosPointer,
+      );
+      final resultadoJson = _leerYLiberar(resultadoPointer);
+      final listaJson = jsonDecode(resultadoJson) as List<dynamic>;
+      return listaJson
+          .map(
+            (item) => Planta.fromJson(Map<String, dynamic>.from(item as Map)),
+          )
+          .toList();
     } finally {
-      // Liberar la cadena enviada como parámetro
-      calloc.free(climaPointer);
+      calloc
+        ..free(climaPointer)
+        ..free(tipoPlantaPointer)
+        ..free(colorPointer)
+        ..free(jsonBaseDatosPointer);
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> obtenerProgresoColeccion(
+    List<String> nombresColeccionadas,
+  ) async {
+    final jsonBaseDatos = await _cargarBaseDatos();
+    final jsonColeccionadasPointer = jsonEncode(nombresColeccionadas)
+        .toNativeUtf8();
+    final jsonBaseDatosPointer = jsonBaseDatos.toNativeUtf8();
+
+    try {
+      final resultadoPointer = _obtenerProgresoColeccion(
+        jsonColeccionadasPointer,
+        jsonBaseDatosPointer,
+      );
+      final resultadoJson = _leerYLiberar(resultadoPointer);
+      return Map<String, dynamic>.from(jsonDecode(resultadoJson) as Map);
+    } finally {
+      calloc
+        ..free(jsonColeccionadasPointer)
+        ..free(jsonBaseDatosPointer);
+    }
+  }
+
+  Future<List<Planta>> obtenerPlantasCompatibles(int altitud, String clima) {
+    return obtenerPlantasCompatiblesAvanzado(altitud, clima, '', '');
+  }
+
+  @override
+  Future<List<Planta>> cargarCatalogo() async {
+    final jsonCatalogo = jsonDecode(await _cargarBaseDatos()) as List<dynamic>;
+    return jsonCatalogo
+        .map((item) => Planta.fromJson(Map<String, dynamic>.from(item as Map)))
+        .toList();
+  }
+
+  Future<String> _cargarBaseDatos() {
+    return rootBundle.loadString('assets/data/plantas.json');
+  }
+
+  String _leerYLiberar(Pointer<Utf8> resultadoPointer) {
+    if (resultadoPointer == nullptr) {
+      throw StateError('La función nativa no devolvió un resultado.');
+    }
+
+    try {
+      return resultadoPointer.toDartString();
+    } finally {
+      _liberarCadena(resultadoPointer);
     }
   }
 }
