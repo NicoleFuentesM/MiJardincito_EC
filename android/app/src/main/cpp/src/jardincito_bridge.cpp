@@ -1,53 +1,81 @@
-//
-//  jardin_bridge.cpp
-//  MyTool
-//
-//  Created by Nicole Rafaela Fuentes Manosalvas on 10/20/26.
-//
-
 #include "jardincito_bridge.h"
 #include "Jardincito.h"
 #include "CargadorJSON.h"
-#include "json.hpp" // Importante: debe incluirse antes del alias 'using json'
+#include "json.hpp"
 
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <vector>
 
 using json = nlohmann::json;
+
+const char* JSON_PLANTAS_DEFAULT = R"([
+  {
+    "nombreComun": "Arrayan de Quito",
+    "nombreCientifico": "Myrcianthes hallii",
+    "region": "Andes",
+    "altitudIdeal": 2800,
+    "tipoClima": "Templado"
+  },
+  {
+    "nombreComun": "Pumamaqui",
+    "nombreCientifico": "Oreopanax ecuadorensis",
+    "region": "Andes",
+    "altitudIdeal": 2800,
+    "tipoClima": "Templado"
+  },
+  {
+    "nombreComun": "Chilca",
+    "nombreCientifico": "Baccharis latifolia",
+    "region": "Andes",
+    "altitudIdeal": 2600,
+    "tipoClima": "Templado"
+  }
+])";
 
 extern "C" {
 
 const char* obtenerPlantasCompatiblesJSON(int altitud, const char* clima) {
     Jardincito miJardin;
     std::string rutaJson = "data/plantas.json";
-    
-    // 1. Cargar la base de datos de plantas
+
     CargadorJSON::cargarPlantas(miJardin, rutaJson);
-    
-    // 2. Ejecutar el filtro de compatibilidad
+
     std::string climaStr = (clima != nullptr) ? std::string(clima) : "";
-    std::vector<PlantaNativa> filtradas = miJardin.buscarPlantasCompatibles(altitud, climaStr);
-    
-    // 3. Serializar las plantas encontradas en una estructura JSON
+    std::vector<PlantaNativa> filtradas =
+        miJardin.buscarPlantasCompatibles(altitud, climaStr);
+
     json arrayResultado = json::array();
-    for (const auto& planta : filtradas) {
-        json item;
-        item["nombreComun"] = planta.getNombreComun();
-        item["nombreCientifico"] = planta.getNombreCientifico();
-        item["region"] = planta.getRegion();
-        item["altitudIdeal"] = planta.getAltitudIdeal();
-        item["tipoClima"] = planta.getTipoClima();
-        arrayResultado.push_back(item);
+
+    if (filtradas.empty()) {
+        auto fallbackJson = json::parse(JSON_PLANTAS_DEFAULT);
+        for (const auto& item : fallbackJson) {
+            int alt = item["altitudIdeal"];
+            std::string cl = item["tipoClima"];
+            if (std::abs(alt - altitud) <= 500 && cl == climaStr) {
+                arrayResultado.push_back(item);
+            }
+        }
+    } else {
+        for (const auto& planta : filtradas) {
+            json item;
+            item["nombreComun"] = planta.getNombreComun();
+            item["nombreCientifico"] = planta.getNombreCientifico();
+            item["region"] = planta.getRegion();
+            item["altitudIdeal"] = planta.getAltitudIdeal();
+            item["tipoClima"] = planta.getTipoClima();
+            arrayResultado.push_back(item);
+        }
     }
-    
-    // 4. Reservar memoria dinamica (heap) para devolver la cadena C a Dart FFI
+
     std::string jsonStr = arrayResultado.dump();
     char* buffer = static_cast<char*>(malloc(jsonStr.length() + 1));
     if (buffer != nullptr) {
         std::strcpy(buffer, jsonStr.c_str());
     }
-    
+
     return buffer;
 }
 

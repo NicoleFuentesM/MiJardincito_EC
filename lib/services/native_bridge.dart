@@ -1,59 +1,66 @@
 import 'dart:convert';
-import 'dart:ffi' as ffi;
+import 'dart:ffi';
 import 'dart:io';
 import 'package:ffi/ffi.dart';
-import '../models/planta_model.dart';
+import '../models/planta.dart';
 
-// Definición de firmas C para la función nativa que creará tu compañera:
-// const char* filtrarPlantasCompatiblesJSON(int altitud, const char* clima);
+// Definición de firmas C
+typedef ObtenerPlantasC = Pointer<Utf8> Function(Int32 altitud, Pointer<Utf8> clima);
+typedef LiberarCadenaC = Void Function(Pointer<Utf8> ptr);
 
-typedef FiltrarCompatiblesC = ffi.Pointer<Utf8> Function(
-  ffi.Int32 altitud,
-  ffi.Pointer<Utf8> clima,
-);
-
-typedef FiltrarCompatiblesDart = ffi.Pointer<Utf8> Function(
-  int altitud,
-  ffi.Pointer<Utf8> clima,
-);
+// Definición de firmas Dart
+typedef ObtenerPlantasDart = Pointer<Utf8> Function(int altitud, Pointer<Utf8> clima);
+typedef LiberarCadenaDart = void Function(Pointer<Utf8> ptr);
 
 class NativeBridge {
-  static late final ffi.DynamicLibrary _bibliotecaNativa;
-  static late final FiltrarCompatiblesDart _filtrarCompatibles;
+  late final DynamicLibrary _dylib;
+  late final ObtenerPlantasDart _obtenerPlantas;
+  late final LiberarCadenaDart _liberarCadena;
 
-  static void inicializar() {
-    // Carga de la biblioteca dinámica compilada según la plataforma
-    if (Platform.isAndroid) {
-      _bibliotecaNativa = ffi.DynamicLibrary.open('libjardincito.so');
-    } else if (Platform.isIOS || Platform.isMacOS) {
-      _bibliotecaNativa = ffi.DynamicLibrary.process();
+  NativeBridge() {
+    // Carga de la biblioteca compilada según plataforma
+    if (Platform.isMacOS || Platform.isIOS) {
+      _dylib = DynamicLibrary.process();
+    } else if (Platform.isAndroid) {
+      _dylib = DynamicLibrary.open('libjardincito.so');
+    } else if (Platform.isWindows) {
+      _dylib = DynamicLibrary.open('jardincito.dll');
     } else {
-      _bibliotecaNativa = ffi.DynamicLibrary.open('libjardincito.dylib');
+      _dylib = DynamicLibrary.process();
     }
 
-    _filtrarCompatibles = _bibliotecaNativa
-        .lookupFunction<FiltrarCompatiblesC, FiltrarCompatiblesDart>(
-          'filtrarPlantasCompatiblesJSON',
-        );
+    _obtenerPlantas = _dylib
+        .lookup<NativeFunction<ObtenerPlantasC>>('obtenerPlantasCompatiblesJSON')
+        .asFunction<ObtenerPlantasDart>();
+
+    _liberarCadena = _dylib
+        .lookup<NativeFunction<LiberarCadenaC>>('liberarCadena')
+        .asFunction<LiberarCadenaDart>();
   }
 
-  // Método de alto nivel para consumir directamente desde la UI de Flutter
-  static List<PlantaModel> obtenerPlantasCompatibles(int altitud, String clima) {
-    final climaPtr = clima.toNativeUtf8();
+  List<Planta> obtenerPlantasCompatibles(int altitud, String clima) {
+    final climaPointer = clima.toNativeUtf8();
 
     try {
-      // 1. Llamada a C++ a través de FFI
-      final ffi.Pointer<Utf8> resultadoPtr = _filtrarCompatibles(altitud, climaPtr);
-      final jsonString = resultadoPtr.toDartString();
+      // 1. Invocar función nativa de C++
+      final resultadoPointer = _obtenerPlantas(altitud, climaPointer);
 
-      // 2. Deserialización usando el modelo que creaste
-      final List<dynamic> listaDecodificada = jsonDecode(jsonString) as List<dynamic>;
-      return listaDecodificada
-          .map((item) => PlantaModel.fromJson(item as Map<String, dynamic>))
-          .toList();
+      if (resultadoPointer == nullptr) {
+        return [];
+      }
+
+      // 2. Leer la cadena UTF-8 en Dart
+      final jsonString = resultadoPointer.toDartString();
+
+      // 3. Liberar la memoria asignada en C++ para evitar memory leaks
+      _liberarCadena(resultadoPointer);
+
+      // 4. Deserializar el JSON
+      final List<dynamic> listaJson = jsonDecode(jsonString);
+      return listaJson.map((item) => Planta.fromJson(item)).toList();
     } finally {
-      // Liberar la memoria asignada para evitar fugas (memory leaks)
-      calloc.free(climaPtr);
+      // Liberar la cadena enviada como parámetro
+      calloc.free(climaPointer);
     }
   }
 }
