@@ -4,6 +4,8 @@ class Planta {
   final String region;
   final int altitudIdeal;
   final String tipoClima;
+  final String tipoPlanta;
+  final String color;
 
   Planta({
     required this.nombreComun,
@@ -11,15 +13,19 @@ class Planta {
     required this.region,
     required this.altitudIdeal,
     required this.tipoClima,
+    this.tipoPlanta = '',
+    this.color = '',
   });
 
   factory Planta.fromJson(Map<String, dynamic> json) {
     return Planta(
-      nombreComun: json['nombreComun'] ?? '',
-      nombreCientifico: json['nombreCientifico'] ?? '',
-      region: json['region'] ?? '',
-      altitudIdeal: json['altitudIdeal'] ?? 0,
-      tipoClima: json['tipoClima'] ?? '',
+      nombreComun: json['nombreComun'] as String? ?? '',
+      nombreCientifico: json['nombreCientifico'] as String? ?? '',
+      region: json['region'] as String? ?? '',
+      altitudIdeal: (json['altitudIdeal'] as num?)?.toInt() ?? 0,
+      tipoClima: json['tipoClima'] as String? ?? '',
+      tipoPlanta: json['tipoPlanta'] as String? ?? '',
+      color: json['color'] as String? ?? '',
     );
   }
 }
