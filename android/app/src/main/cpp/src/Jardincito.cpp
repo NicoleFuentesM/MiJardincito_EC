@@ -19,40 +19,78 @@ std::vector<PlantaNativa> Jardincito::buscarPlantasCompatibles(int altitudUsuari
     return buscarPlantasCompatiblesAvanzado(altitudUsuario, climaUsuario, "", "");
 }
 
+// Función auxiliar estática para calcular coincidencia de 0% a 100%
+static double calcularPorcentajeCoincidencia(
+    int altitudUser, const std::string& climaUser,
+    const std::string& tipoUser, const std::string& colorUser,
+    const PlantaNativa& planta
+) {
+    double puntaje = 0.0;
+
+    // 1. Altitud (Peso máximo: 30%) - Proporcional dentro del rango de +-500m
+    int diffAlt = std::abs(planta.getAltitudIdeal() - altitudUser);
+    if (diffAlt <= 500) {
+        puntaje += 30.0 * (1.0 - (static_cast<double>(diffAlt) / 500.0));
+    }
+
+    // 2. Clima (Peso máximo: 25%) - Coincidencia exacta
+    if (!climaUser.empty() && climaUser == planta.getTipoClima()) {
+        puntaje += 25.0;
+    }
+
+    // 3. Tipo de Planta (Peso máximo: 25%) - Coincidencia exacta
+    if (!tipoUser.empty() && tipoUser == planta.getTipoPlanta()) {
+        puntaje += 25.0;
+    }
+
+    // 4. Color (Peso máximo: 20%) - Coincidencia exacta
+    if (!colorUser.empty() && colorUser == planta.getColor()) {
+        puntaje += 20.0;
+    }
+
+    return puntaje;
+}
+
 std::vector<PlantaNativa> Jardincito::buscarPlantasCompatiblesAvanzado(
     int altitudUsuario,
     const std::string& climaUsuario,
     const std::string& tipoPlantaUsuario,
     const std::string& colorUsuario
 ) const {
-    std::vector<PlantaNativa> compatibles;
+    std::vector<PlantaNativa> resultado;
+
+    double maxPuntaje = -1.0;
+    const PlantaNativa* mejorCandidata = nullptr;
 
     for (const auto& planta : listaPlantas) {
-        // 1. Filtro de Altitud (+- 500 metros)
-        bool coincideAltitud = std::abs(planta.getAltitudIdeal() - altitudUsuario) <= 500;
+        double score = calcularPorcentajeCoincidencia(
+            altitudUsuario, climaUsuario, tipoPlantaUsuario, colorUsuario, planta
+        );
 
-        // 2. Filtro de Clima (coincidencia exacta o comodín "Todos" / "")
-        bool coincideClima = climaUsuario.empty() || climaUsuario == "Todos" || planta.getTipoClima() == climaUsuario;
+        // Si la coincidencia es exacta (100%), se agrega a la lista de éxitos
+        if (score >= 99.0) {
+            resultado.push_back(planta);
+        }
 
-        // 3. Filtro de Tipo de Planta (coincidencia exacta o comodín "Todos" / "")
-        bool coincideTipo = tipoPlantaUsuario.empty() || tipoPlantaUsuario == "Todos" || planta.getTipoPlanta() == tipoPlantaUsuario;
-
-        // 4. Filtro de Color (coincidencia exacta o comodín "Todos" / "")
-        bool coincideColor = colorUsuario.empty() || colorUsuario == "Todos" || planta.getColor() == colorUsuario;
-
-        if (coincideAltitud && coincideClima && coincideTipo && coincideColor) {
-            compatibles.push_back(planta);
+        // Guardar la planta con mayor coincidencia para sugerencia cercana
+        if (score > maxPuntaje) {
+            maxPuntaje = score;
+            mejorCandidata = &planta;
         }
     }
 
-    return compatibles;
+    // Si no hubo coincidencia perfecta de 100%, retornar únicamente la planta más cercana
+    if (resultado.empty() && mejorCandidata != nullptr) {
+        resultado.push_back(*mejorCandidata);
+    }
+
+    return resultado;
 }
 
 std::string Jardincito::generarReporteColeccion(const std::vector<std::string>& nombresColeccionados) const {
     int totalBaseDatos = static_cast<int>(listaPlantas.size());
     int contadorValidos = 0;
 
-    // Verificar cuántas plantas de la lista ingresada realmente existen en el catálogo
     for (const auto& nombre : nombresColeccionados) {
         bool existe = std::any_of(listaPlantas.begin(), listaPlantas.end(),
             [&nombre](const PlantaNativa& p) { return p.getNombreComun() == nombre; });
@@ -65,7 +103,6 @@ std::string Jardincito::generarReporteColeccion(const std::vector<std::string>& 
         ? (static_cast<double>(contadorValidos) / totalBaseDatos) * 100.0
         : 0.0;
 
-    // Asignación de nivel según el porcentaje alcanzado
     std::string nivel = "Sembrador Novato";
     if (porcentaje >= 80.0) {
         nivel = "Guardia de la Flora Andina";

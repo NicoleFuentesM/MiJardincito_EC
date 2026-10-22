@@ -7,6 +7,7 @@
 #include <cstring>
 #include <string>
 #include <vector>
+#include <cmath>
 
 using json = nlohmann::json;
 
@@ -21,27 +22,22 @@ const char* obtenerPlantasCompatiblesAvanzadoJSON(
 ) {
     Jardincito miJardin;
 
-    // 1. Cargar plantas desde la cadena JSON en memoria (enviada desde Flutter)
     if (jsonBaseDatos != nullptr && std::strlen(jsonBaseDatos) > 0) {
         CargadorJSON::cargarPlantasDesdeString(miJardin, std::string(jsonBaseDatos));
     } else {
-        // Fallback para ejecuciones locales en Xcode
         CargadorJSON::cargarPlantas(miJardin, "data/plantas.json");
     }
 
-    // 2. Convertir parámetros C a std::string de C++
     std::string climaStr = (clima != nullptr) ? std::string(clima) : "";
     std::string tipoStr = (tipoPlanta != nullptr) ? std::string(tipoPlanta) : "";
     std::string colorStr = (color != nullptr) ? std::string(color) : "";
 
-    // 3. Filtrar especies compatibles con el algoritmo multicriterio
-    std::vector<PlantaNativa> filtradas = miJardin.buscarPlantasCompatiblesAvanzado(
+    std::vector<PlantaNativa> recomendadas = miJardin.buscarPlantasCompatiblesAvanzado(
         altitud, climaStr, tipoStr, colorStr
     );
 
-    // 4. Serializar el resultado a un Array JSON
     json arrayResultado = json::array();
-    for (const auto& planta : filtradas) {
+    for (const auto& planta : recomendadas) {
         json item;
         item["nombreComun"] = planta.getNombreComun();
         item["nombreCientifico"] = planta.getNombreCientifico();
@@ -50,10 +46,19 @@ const char* obtenerPlantasCompatiblesAvanzadoJSON(
         item["tipoClima"] = planta.getTipoClima();
         item["tipoPlanta"] = planta.getTipoPlanta();
         item["color"] = planta.getColor();
+
+        // Recalcular puntaje específico de esta planta para la UI de Flutter
+        double score = 0.0;
+        int diffAlt = std::abs(planta.getAltitudIdeal() - altitud);
+        if (diffAlt <= 500) score += 30.0 * (1.0 - (static_cast<double>(diffAlt) / 500.0));
+        if (!climaStr.empty() && climaStr == planta.getTipoClima()) score += 25.0;
+        if (!tipoStr.empty() && tipoStr == planta.getTipoPlanta()) score += 25.0;
+        if (!colorStr.empty() && colorStr == planta.getColor()) score += 20.0;
+
+        item["porcentajeCoincidencia"] = static_cast<int>(score);
         arrayResultado.push_back(item);
     }
 
-    // 5. Reservar memoria en el heap para entregar la cadena a Dart FFI
     std::string jsonStr = arrayResultado.dump();
     char* buffer = static_cast<char*>(malloc(jsonStr.length() + 1));
     if (buffer != nullptr) {
@@ -69,14 +74,12 @@ const char* obtenerProgresoColeccionJSON(
 ) {
     Jardincito miJardin;
 
-    // 1. Cargar la base de datos completa de plantas
     if (jsonBaseDatos != nullptr && std::strlen(jsonBaseDatos) > 0) {
         CargadorJSON::cargarPlantasDesdeString(miJardin, std::string(jsonBaseDatos));
     } else {
         CargadorJSON::cargarPlantas(miJardin, "data/plantas.json");
     }
 
-    // 2. Parsear la lista de plantas coleccionadas enviada desde Flutter
     std::vector<std::string> listaColeccionadas;
     if (jsonColeccionadas != nullptr && std::strlen(jsonColeccionadas) > 0) {
         try {
@@ -88,15 +91,11 @@ const char* obtenerProgresoColeccionJSON(
                     }
                 }
             }
-        } catch (...) {
-            // Manejo de error si la cadena enviada no es un JSON válido
-        }
+        } catch (...) {}
     }
 
-    // 3. Generar las estadísticas en C++
     std::string reporteStr = miJardin.generarReporteColeccion(listaColeccionadas);
 
-    // 4. Retornar memoria reservada para FFI
     char* buffer = static_cast<char*>(malloc(reporteStr.length() + 1));
     if (buffer != nullptr) {
         std::strcpy(buffer, reporteStr.c_str());
