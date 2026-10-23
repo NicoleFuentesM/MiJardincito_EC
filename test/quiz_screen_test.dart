@@ -32,6 +32,7 @@ void main() {
     );
 
     expect(find.text('Altitud'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quiz-back')), findsOneWidget);
     expect(find.text('2800 msnm'), findsOneWidget);
     expect(find.byType(RotatedBox), findsOneWidget);
     expect(
@@ -51,6 +52,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Clima'), findsOneWidget);
     expect(find.text('Templado'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quiz-back')), findsOneWidget);
     await tester.drag(find.byType(PageView).last, const Offset(0, -400));
     await tester.pumpAndSettle();
     expect(find.text('Frío'), findsOneWidget);
@@ -65,15 +67,23 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
     expect(find.text('Tipo'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quiz-back')), findsOneWidget);
     expect(find.text('Árbol'), findsOneWidget);
     expect(find.text('Arbusto'), findsOneWidget);
     expect(find.text('Hierba'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('tipo-Arbusto')));
     expect(busqueda.tipoPlanta, 'Arbusto');
+    await tester.tap(find.byKey(const ValueKey('quiz-back')));
+    await tester.pumpAndSettle();
+    expect(find.text('Clima'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('quiz-next')));
+    await tester.pumpAndSettle();
+    expect(find.text('Tipo'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
     expect(find.text('Color'), findsOneWidget);
+    expect(find.byKey(const ValueKey('quiz-back')), findsOneWidget);
     expect(find.text('Blanco'), findsWidgets);
     await tester.drag(
       find.byKey(const ValueKey('color-page-view')),
@@ -94,9 +104,11 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Plantas compatibles'), findsOneWidget);
-    expect(find.text('Arrayán'), findsOneWidget);
+    expect(find.text('Arrayán'), findsNWidgets(2));
     expect(motor.busquedaRealizada, isTrue);
 
+    await tester.ensureVisible(find.text('¡Coleccionar!'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('¡Coleccionar!'));
     await tester.pumpAndSettle();
     expect(coleccion.nombresAdoptados, ['Arrayán']);

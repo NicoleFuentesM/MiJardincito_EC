@@ -54,28 +54,32 @@ class QuizResultadoScreen extends StatelessWidget {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-          child: Text(
-            'Plantas compatibles',
-            style: Theme.of(context).textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Plantas compatibles',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: colores.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            for (var indice = 0; indice < busqueda.plantas.length; indice++) ...[
+              TarjetaPlanta(
+                planta: busqueda.plantas[indice],
+                key: ValueKey(busqueda.plantas[indice].nombreComun),
+              ),
+              if (indice < busqueda.plantas.length - 1)
+                const SizedBox(height: 20),
+            ],
+          ],
         ),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: busqueda.plantas.length,
-            itemBuilder: (context, index) {
-              final planta = busqueda.plantas[index];
-              return TarjetaPlanta(planta: planta);
-            },
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

@@ -50,8 +50,7 @@ class QuizPreguntaClimaScreen extends StatefulWidget {
   static int paginaInicial(int indice) {
     const paginaBase = 1000000;
     final desplazamiento =
-        (indice - paginaBase % climasVisuales.length) %
-        climasVisuales.length;
+        (indice - paginaBase % climasVisuales.length) % climasVisuales.length;
     return paginaBase + desplazamiento;
   }
 
@@ -96,11 +95,9 @@ class _QuizPreguntaClimaScreenState extends State<QuizPreguntaClimaScreen> {
     final indiceClima = indice % QuizPreguntaClimaScreen.climasVisuales.length;
     if (indiceClima == _indiceSeleccionado) return;
     setState(() => _indiceSeleccionado = indiceClima);
-    context
-        .read<BusquedaPlantasProvider>()
-        .cambiarClima(
-          QuizPreguntaClimaScreen.climasVisuales[indiceClima].nombre,
-        );
+    context.read<BusquedaPlantasProvider>().cambiarClima(
+      QuizPreguntaClimaScreen.climasVisuales[indiceClima].nombre,
+    );
   }
 
   @override
@@ -148,47 +145,71 @@ class _QuizPreguntaClimaScreenState extends State<QuizPreguntaClimaScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Desliza para elegir el clima de tu jardín',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF4D584F),
-            ),
+            'Desliza hacia abajo para elegir el clima de tu jardín',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: const Color(0xFF4D584F)),
             textAlign: TextAlign.center,
           ),
           Expanded(
-            child: PageView.builder(
-              controller: _controladorClima,
-              scrollDirection: Axis.vertical,
-              onPageChanged: _seleccionarClima,
-              itemBuilder: (context, indice) {
-                final opcion =
-                    QuizPreguntaClimaScreen.climasVisuales[
-                      indice % QuizPreguntaClimaScreen.climasVisuales.length
-                    ];
+            child: Row(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _controladorClima,
+                    scrollDirection: Axis.vertical,
+                    onPageChanged: _seleccionarClima,
+                    itemBuilder: (context, indice) {
+                      final opcion =
+                          QuizPreguntaClimaScreen.climasVisuales[indice %
+                              QuizPreguntaClimaScreen.climasVisuales.length];
 
-                return LayoutBuilder(
-                  builder: (context, constraints) => Center(
-                    child: AnimatedScale(
-                      scale:
-                          indice %
-                                  QuizPreguntaClimaScreen
-                                      .climasVisuales
-                                      .length ==
-                              _indiceSeleccionado
-                          ? 1
-                          : 0.88,
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeOutBack,
-                      child: Image.asset(
-                        opcion.imagen,
-                        width: constraints.maxWidth * 0.88,
-                        height: constraints.maxHeight * 0.78,
-                        fit: BoxFit.contain,
-                        semanticLabel: opcion.nombre,
+                      return LayoutBuilder(
+                        builder: (context, constraints) => Center(
+                          child: AnimatedScale(
+                            scale:
+                                indice %
+                                            QuizPreguntaClimaScreen
+                                                .climasVisuales
+                                                .length ==
+                                        _indiceSeleccionado
+                                    ? 1
+                                    : 0.88,
+                            duration: const Duration(milliseconds: 280),
+                            curve: Curves.easeOutBack,
+                            child: Image.asset(
+                              opcion.imagen,
+                              width: constraints.maxWidth * 0.88,
+                              height: constraints.maxHeight * 0.78,
+                              fit: BoxFit.contain,
+                              semanticLabel: opcion.nombre,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    QuizPreguntaClimaScreen.climasVisuales.length,
+                    (indice) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(vertical: 3),
+                      width: 7,
+                      height: indice == _indiceSeleccionado ? 18 : 7,
+                      decoration: BoxDecoration(
+                        color: indice == _indiceSeleccionado
+                            ? colores.primary
+                            : const Color(0xFF758078).withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(8),
                       ),
                     ),
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 4),
+              ],
             ),
           ),
           AnimatedSwitcher(
@@ -196,29 +217,9 @@ class _QuizPreguntaClimaScreenState extends State<QuizPreguntaClimaScreen> {
             child: Text(
               clima.descripcion,
               key: ValueKey('${clima.nombre}-descripcion'),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF37443A),
-              ),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: const Color(0xFF37443A)),
               textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              QuizPreguntaClimaScreen.climasVisuales.length,
-              (indice) => AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: indice == _indiceSeleccionado ? 18 : 7,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: indice == _indiceSeleccionado
-                      ? colores.primary
-                      : const Color(0xFF758078).withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
             ),
           ),
         ],

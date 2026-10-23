@@ -100,60 +100,68 @@ class _QuizPreguntaColorScreenState extends State<QuizPreguntaColorScreen> {
             textAlign: TextAlign.center,
           ),
           Expanded(
-            child: PageView.builder(
-              key: const ValueKey('color-page-view'),
-              controller: _controladorColores,
-              scrollDirection: Axis.vertical,
-              onPageChanged: _seleccionarColor,
-              itemBuilder: (context, indice) {
-                final opcion =
-                    QuizPreguntaColorScreen.coloresVisuales[indice %
-                        QuizPreguntaColorScreen.coloresVisuales.length];
+            child: Row(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    key: const ValueKey('color-page-view'),
+                    controller: _controladorColores,
+                    scrollDirection: Axis.vertical,
+                    onPageChanged: _seleccionarColor,
+                    itemBuilder: (context, indice) {
+                      final opcion =
+                          QuizPreguntaColorScreen.coloresVisuales[indice %
+                              QuizPreguntaColorScreen.coloresVisuales.length];
 
-                return Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      opcion.nombre,
-                      style: TextStyle(
-                        color:
-                            ThemeData.estimateBrightnessForColor(
-                                  opcion.fondo,
-                                ) ==
-                                Brightness.dark
-                            ? Colors.white
-                            : const Color(0xFF24302A),
-                        fontSize: 46,
-                        fontWeight: FontWeight.w700,
+                      return Center(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            opcion.nombre,
+                            style: TextStyle(
+                              color:
+                                  ThemeData.estimateBrightnessForColor(
+                                        opcion.fondo,
+                                      ) ==
+                                      Brightness.dark
+                                  ? Colors.white
+                                  : const Color(0xFF24302A),
+                              fontSize: 46,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    QuizPreguntaColorScreen.coloresVisuales.length,
+                    (indice) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.symmetric(vertical: 3),
+                      width: 7,
+                      height: indice == _indiceSeleccionado ? 18 : 7,
+                      decoration: BoxDecoration(
+                        color: colorTexto.withValues(
+                          alpha: indice == _indiceSeleccionado ? 0.9 : 0.35,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      textAlign: TextAlign.center,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(
-              QuizPreguntaColorScreen.coloresVisuales.length,
-              (indice) => AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: indice == _indiceSeleccionado ? 18 : 7,
-                height: 7,
-                decoration: BoxDecoration(
-                  color: colorTexto.withValues(
-                    alpha: indice == _indiceSeleccionado ? 0.9 : 0.35,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
+                const SizedBox(width: 4),
+              ],
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Desliza para elegir un color',
+            'Desliza hacia abajo para elegir un color',
             style: Theme.of(context).textTheme.bodySmall
                 ?.copyWith(color: colorTexto.withValues(alpha: 0.8)),
             textAlign: TextAlign.center,

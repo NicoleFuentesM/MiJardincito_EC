@@ -25,6 +25,8 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final busqueda = context.watch<BusquedaPlantasProvider>();
     final colores = Theme.of(context).colorScheme;
+    final opciones = QuizPreguntaTipoScreen.opciones;
+    const assetPlaceholder = QuizPreguntaTipoScreen._assetPlaceholder;
 
     return Container(
       color: const Color(0xFFF9F8F6),
@@ -42,9 +44,8 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             'Elige el tipo de planta que buscas',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: const Color(0xFF697267),
-            ),
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(color: const Color(0xFF697267)),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -64,7 +65,7 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
                                 seleccionada:
                                     busqueda.tipoPlanta ==
                                     opciones[indice].nombre,
-                                assetPlaceholder: _assetPlaceholder,
+                                assetPlaceholder: assetPlaceholder,
                                 colorSeleccion: colores.primary,
                                 onTap: () => busqueda.cambiarTipoPlanta(
                                   opciones[indice].nombre,
@@ -84,11 +85,10 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
                             opcion: opciones[2],
                             seleccionada:
                                 busqueda.tipoPlanta == opciones[2].nombre,
-                            assetPlaceholder: _assetPlaceholder,
+                            assetPlaceholder: assetPlaceholder,
                             colorSeleccion: colores.primary,
-                            onTap: () => busqueda.cambiarTipoPlanta(
-                              opciones[2].nombre,
-                            ),
+                            onTap: () =>
+                                busqueda.cambiarTipoPlanta(opciones[2].nombre),
                           ),
                         ),
                       ),
@@ -125,7 +125,9 @@ class _TarjetaTipoPlanta extends StatelessWidget {
     final borde = seleccionada ? colorSeleccion : const Color(0xFFD8DED2);
 
     return Material(
-      color: seleccionada ? colorSeleccion.withValues(alpha: 0.08) : Colors.white,
+      color: seleccionada
+          ? colorSeleccion.withValues(alpha: 0.08)
+          : Colors.white,
       borderRadius: BorderRadius.circular(20),
       child: InkWell(
         key: ValueKey('tipo-${opcion.nombre}'),

@@ -50,6 +50,19 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  void _regresar() {
+    if (_paginaActual == 0) {
+      widget.onGardenTap();
+      return;
+    }
+
+    setState(() => _paginaActual--);
+    _controladorPaginas.previousPage(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   void dispose() {
     _controladorPaginas.dispose();
@@ -126,10 +139,21 @@ class _QuizScreenState extends State<QuizScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton.filledTonal(
-                  tooltip: 'Mi jardín',
-                  onPressed: widget.onGardenTap,
-                  icon: const Icon(Icons.yard),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton.filledTonal(
+                      tooltip: 'Mi jardín',
+                      onPressed: widget.onGardenTap,
+                      icon: const Icon(Icons.yard),
+                    ),
+                    IconButton(
+                      key: const ValueKey('quiz-back'),
+                      tooltip: 'Regresar',
+                      onPressed: _regresar,
+                      icon: const Icon(Icons.arrow_back),
+                    ),
+                  ],
                 ),
                 FilledButton.icon(
                   key: const ValueKey('quiz-next'),

@@ -93,7 +93,7 @@ class QuizPreguntaAltitudScreen extends StatelessWidget {
                                 min: 0,
                                 max: 5000,
                                 divisions: 100,
-                                label: '${busqueda.altitud} msnm',
+                                
                                 value: busqueda.altitud.toDouble(),
                                 onChanged: busqueda.cambiarAltitud,
                               ),
