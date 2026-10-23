@@ -1,51 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mijardincito_ec/main.dart';
+import 'package:mijardincito_ec/models/planta.dart';
+import 'package:mijardincito_ec/presentation/providers/busqueda_plantas_provider.dart';
+import 'package:mijardincito_ec/presentation/providers/coleccion_plantas_provider.dart';
+import 'package:mijardincito_ec/presentation/providers/jardin_virtual_provider.dart';
+import 'package:mijardincito_ec/services/native_bridge.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('La vista muestra los filtros multicriterio', (
-    WidgetTester tester,
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
+  testWidgets('el primer inicio abre el cuestionario sin barra superior', (
+    tester,
   ) async {
     await tester.pumpWidget(const MiJardincitoApp());
-
-    expect(find.text('Altitud: 2800 msnm'), findsOneWidget);
-    expect(find.byType(Slider), findsOneWidget);
-    expect(find.byType(DropdownButtonFormField<String>), findsNWidgets(3));
-    expect(find.text('Clima'), findsOneWidget);
-    expect(find.text('Tipo de planta'), findsOneWidget);
-    expect(find.text('Color'), findsOneWidget);
-    expect(find.text('Buscar especies compatibles'), findsOneWidget);
-
-    await tester.tap(find.byType(DropdownButtonFormField<String>).first);
-    await tester.pumpAndSettle();
-    expect(find.text('Cálido'), findsOneWidget);
-    expect(find.text('Frío'), findsOneWidget);
-    expect(find.text('Páramo'), findsOneWidget);
-
-    await tester.tap(find.text('Frío'));
-    await tester.pumpAndSettle();
-    expect(find.text('Frío'), findsOneWidget);
-
-    await tester.tap(find.byType(DropdownButtonFormField<String>).at(1));
-    await tester.pumpAndSettle();
-    expect(find.text('Árbol'), findsOneWidget);
-    expect(find.text('Arbusto'), findsOneWidget);
-    expect(find.text('Hierba'), findsOneWidget);
-    await tester.tap(find.text('Árbol'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byType(DropdownButtonFormField<String>).at(2));
-    await tester.pumpAndSettle();
-    for (final color in [
-      'Blanco',
-      'Verde',
-      'Naranja',
-      'Amarillo',
-      'Morado',
-      'Rojo',
-      'Azul',
-    ]) {
-      expect(find.text(color), findsOneWidget);
-    }
+    expect(find.text('¿A qué altitud está tu jardín?'), findsOneWidget);
+    expect(find.text('Mi Jardincito EC'), findsNothing);
+    expect(find.byType(AppBar), findsNothing);
+    expect(find.text('Buscar'), findsNothing);
   });
+
+  testWidgets('abre Mi Jardín si ya hay una planta en la colección', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({
+      'nombres_plantas_adoptadas': ['Arrayán'],
+    });
+    final coleccion = ColeccionPlantasProvider();
+    await coleccion.cargar();
+    final motor = _MotorFalso();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => BusquedaPlantasProvider(motor: motor),
+          ),
+          ChangeNotifierProvider.value(value: coleccion),
+          ChangeNotifierProvider(
+            create: (_) => JardinVirtualProvider(motor: motor),
+          ),
+        ],
+        child: const MaterialApp(home: NavegacionPrincipal()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final navegacion = tester.widget<NavigationBar>(find.byType(NavigationBar));
+    expect(navegacion.selectedIndex, 1);
+    expect(find.text('Buscar'), findsOneWidget);
+    expect(find.text('Mi Jardín'), findsOneWidget);
+    expect(find.byType(AppBar), findsNothing);
+  });
+}
+
+class _MotorFalso implements MotorJardin {
+  @override
+  Future<List<Planta>> cargarCatalogo() async => [];
+
+  @override
+  Future<Map<String, dynamic>> obtenerProgresoColeccion(
+    List<String> nombresColeccionadas,
+  ) async => {
+    'totalColeccionadas': nombresColeccionadas.length,
+    'totalEspecies': 0,
+    'porcentaje': 0.0,
+    'nivelJardinero': 'Sembrador Novato',
+  };
+
+  @override
+  Future<List<Planta>> obtenerPlantasCompatiblesAvanzado(
+    int altitud,
+    String clima,
+    String tipoPlanta,
+    String color,
+  ) async => [];
 }

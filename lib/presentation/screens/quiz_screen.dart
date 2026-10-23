@@ -1,43 +1,59 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import '../../models/planta_model.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/busqueda_plantas_provider.dart';
+import 'quiz_pregunta_altitud_screen.dart';
+import 'quiz_pregunta_clima_screen.dart';
+import 'quiz_pregunta_color_screen.dart';
+import 'quiz_pregunta_tipo_screen.dart';
+import 'quiz_resultado_screen.dart';
 
 class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+  const QuizScreen({required this.onGardenTap, super.key});
+
+  final VoidCallback onGardenTap;
 
   @override
   State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
-  double _altitudSeleccionada = 2800; // Valor inicial por defecto (Quito)
-  String _climaSeleccionado = 'Templado';
+  static const int _cantidadPreguntas = 4;
+  final PageController _controladorPaginas = PageController();
+  int _paginaActual = 0;
 
-  final List<String> _opcionesClima = [
-    'Paramo',
-    'Templado',
-    'Seco Tropical',
-    'Bosque Nublado',
-    'Humedo Tropical',
-  ];
+  bool get _esResultado => _paginaActual == _cantidadPreguntas;
 
-  // Lista temporal para mostrar las plantas filtradas
-  final List<PlantaModel> _plantasCompatibles = [];
+  void _avanzar() {
+    if (_esResultado) {
+      setState(() => _paginaActual = 0);
+      _controladorPaginas.jumpToPage(0);
+      return;
+    }
 
-  void _consultarCompatibilidad() {
-    // Nota: En el Día 3 aquí llamaremos a la función nativa C++ mediante FFI.
-    // Por ahora, validamos la regla localmente en Dart para probar la UI:
-    // Tolerancia: |altitudIdeal - altitud| <= 500 y mismo clima.
-    setState(() {
-      // Feedback visual temporal
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Consultando para ${_altitudSeleccionada.toInt()} msnm y clima $_climaSeleccionado...',
-          ),
-          duration: const Duration(seconds: 1),
-        ),
+    if (_paginaActual == _cantidadPreguntas - 1) {
+      setState(() => _paginaActual++);
+      _controladorPaginas.nextPage(
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeInOut,
       );
-    });
+      unawaited(context.read<BusquedaPlantasProvider>().buscarPlantas());
+      return;
+    }
+
+    setState(() => _paginaActual++);
+    _controladorPaginas.nextPage(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controladorPaginas.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,99 +61,66 @@ class _QuizScreenState extends State<QuizScreen> {
     final colores = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mi Jardincito EC - Selector'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SafeArea(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Altitud: ${_altitudSeleccionada.toInt()} msnm',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Slider(
-              value: _altitudSeleccionada,
-              min: 0,
-              max: 4500,
-              divisions: 90,
-              label: '${_altitudSeleccionada.toInt()} m',
-              activeColor: colores.primary,
-              onChanged: (value) {
-                setState(() {
-                  _altitudSeleccionada = value;
-                });
-              },
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Tipo de Clima:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            DropdownButton<String>(
-              value: _climaSeleccionado,
-              isExpanded: true,
-              items: _opcionesClima.map((String clima) {
-                return DropdownMenuItem<String>(
-                  value: clima,
-                  child: Text(clima),
-                );
-              }).toList(),
-              onChanged: (nuevoClima) {
-                if (nuevoClima != null) {
-                  setState(() {
-                    _climaSeleccionado = nuevoClima;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colores.primary,
-                foregroundColor: colores.onPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 12),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    _esResultado
+                        ? 'Tu jardín ideal'
+                        : 'Pregunta ${_paginaActual + 1} de $_cantidadPreguntas',
+                    style: Theme.of(context).textTheme.titleSmall,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  LinearProgressIndicator(
+                    value: (_paginaActual + 1) / (_cantidadPreguntas + 1),
+                    color: colores.primary,
+                    backgroundColor: colores.surfaceContainerHighest,
+                  ),
+                ],
               ),
-              onPressed: _consultarCompatibilidad,
-              icon: const Icon(Icons.search),
-              label: const Text('Buscar Plantas Compatibles'),
             ),
-            const Divider(height: 32),
             Expanded(
-              child: _plantasCompatibles.isEmpty
-                    ? Center(
-                      child: Text(
-                        'Ajusta tu altitud y clima para ver qué especies sobreviven en tu jardín.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: colores.onSurfaceVariant),
-                      ),
-                    )
-                  : ListView.builder(
-                      itemCount: _plantasCompatibles.length,
-                      itemBuilder: (context, index) {
-                        final planta = _plantasCompatibles[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 6),
-                          child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Color(0xFF94CEA7),
-                              child: Icon(
-                                Icons.eco,
-                                color: Color(0xFF1D2B20),
-                              ),
-                            ),
-                            title: Text(planta.nombreComun),
-                            subtitle: Text(
-                              '${planta.nombreCientifico}\nRegión: ${planta.region} | Altitud: ${planta.altitudIdeal} msnm',
-                            ),
-                            isThreeLine: true,
-                          ),
-                        );
-                      },
-                    ),
+              child: PageView(
+                controller: _controladorPaginas,
+                physics: const NeverScrollableScrollPhysics(),
+                children: const [
+                  QuizPreguntaAltitudScreen(),
+                  QuizPreguntaClimaScreen(),
+                  QuizPreguntaTipoScreen(),
+                  QuizPreguntaColorScreen(),
+                  QuizResultadoScreen(),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                tooltip: 'Mi jardín',
+                onPressed: widget.onGardenTap,
+                icon: const Icon(Icons.yard),
+              ),
+              FilledButton.icon(
+                key: const ValueKey('quiz-next'),
+                onPressed: _avanzar,
+                icon: Icon(_esResultado ? Icons.replay : Icons.arrow_forward),
+                label: Text(_esResultado ? 'Empezar de nuevo' : 'Siguiente'),
+              ),
+            ],
+          ),
         ),
       ),
     );
