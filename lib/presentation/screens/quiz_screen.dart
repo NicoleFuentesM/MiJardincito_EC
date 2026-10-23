@@ -42,11 +42,11 @@ class _QuizScreenState extends State<QuizScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Jardincito EC - Selector'),
-        backgroundColor: Colors.green.shade700,
-        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,7 +63,7 @@ class _QuizScreenState extends State<QuizScreen> {
               max: 4500,
               divisions: 90,
               label: '${_altitudSeleccionada.toInt()} m',
-              activeColor: Colors.green.shade700,
+              activeColor: colores.primary,
               onChanged: (value) {
                 setState(() {
                   _altitudSeleccionada = value;
@@ -95,8 +95,8 @@ class _QuizScreenState extends State<QuizScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green.shade700,
-                foregroundColor: Colors.white,
+                backgroundColor: colores.primary,
+                foregroundColor: colores.onPrimary,
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               onPressed: _consultarCompatibilidad,
@@ -106,11 +106,11 @@ class _QuizScreenState extends State<QuizScreen> {
             const Divider(height: 32),
             Expanded(
               child: _plantasCompatibles.isEmpty
-                  ? const Center(
+                    ? Center(
                       child: Text(
                         'Ajusta tu altitud y clima para ver qué especies sobreviven en tu jardín.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: colores.onSurfaceVariant),
                       ),
                     )
                   : ListView.builder(
@@ -121,8 +121,11 @@ class _QuizScreenState extends State<QuizScreen> {
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           child: ListTile(
                             leading: const CircleAvatar(
-                              backgroundColor: Colors.lightGreen,
-                              child: Icon(Icons.eco, color: Colors.white),
+                              backgroundColor: Color(0xFF94CEA7),
+                              child: Icon(
+                                Icons.eco,
+                                color: Color(0xFF1D2B20),
+                              ),
                             ),
                             title: Text(planta.nombreComun),
                             subtitle: Text(

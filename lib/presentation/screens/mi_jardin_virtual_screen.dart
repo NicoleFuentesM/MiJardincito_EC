@@ -132,6 +132,8 @@ class _TarjetaJardin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
+
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -142,7 +144,7 @@ class _TarjetaJardin extends StatelessWidget {
             Icon(
               adoptada ? Icons.local_florist : Icons.lock_outline,
               size: 48,
-              color: adoptada ? Colors.green : Colors.grey,
+              color: adoptada ? colores.primary : colores.onSurfaceVariant,
             ),
             const SizedBox(height: 8),
             Text(

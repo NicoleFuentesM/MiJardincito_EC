@@ -25,8 +25,60 @@ class MiJardincitoApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(create: (_) => JardinVirtualProvider()),
       ],
-      child: const MaterialApp(
+      child: MaterialApp(
         debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          useMaterial3: true,
+          fontFamily: 'Ubuntu',
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color(0xFF4E9F43),
+          ).copyWith(
+            primary: const Color(0xFF4E9F43),
+            onPrimary: const Color(0xFF17240B),
+            secondary: const Color(0xFF94CEA7),
+            onSecondary: const Color(0xFF1D2B20),
+            tertiary: const Color(0xFFA7472D),
+            onTertiary: Colors.white,
+            primaryContainer: const Color(0xFFDEE994),
+            onPrimaryContainer: const Color(0xFF17240B),
+            surface: const Color(0xFFF1F6E8),
+            surfaceContainerLowest: const Color(0xFFEDF4E3),
+            surfaceContainerLow: const Color(0xFFE8F1DB),
+            surfaceContainer: const Color(0xFFE2EDD4),
+            surfaceContainerHigh: const Color(0xFFDCE9CD),
+            surfaceContainerHighest: const Color(0xFFD4E4C2),
+          ),
+          scaffoldBackgroundColor: const Color(0xFFF1F6E8),
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Color(0xFF4E9F43),
+            foregroundColor: Color(0xFF17240B),
+            elevation: 0,
+          ),
+          cardTheme: const CardThemeData(
+            color: Color(0xFFE8F1DB),
+            elevation: 0,
+          ),
+          navigationBarTheme: const NavigationBarThemeData(
+            backgroundColor: Color(0xFFE8F1DB),
+            indicatorColor: Color(0xFFDEE994),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: const Color(0xFFE8F1DB),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF94CEA7)),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF94CEA7)),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: Color(0xFF4E9F43), width: 2),
+            ),
+          ),
+        ),
         home: NavegacionPrincipal(),
       ),
     );
