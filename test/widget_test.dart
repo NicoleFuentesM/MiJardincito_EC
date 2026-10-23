@@ -20,7 +20,7 @@ void main() {
     await tester.pumpWidget(const MiJardincitoApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('¿A qué altitud está tu jardín?'), findsOneWidget);
+    expect(find.text('Altitud'), findsOneWidget);
     expect(find.text('Mi Jardincito EC'), findsNothing);
     expect(find.byType(AppBar), findsNothing);
     expect(find.text('Buscar'), findsNothing);

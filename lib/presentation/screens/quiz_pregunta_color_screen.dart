@@ -3,37 +3,160 @@ import 'package:provider/provider.dart';
 
 import '../providers/busqueda_plantas_provider.dart';
 
-class QuizPreguntaColorScreen extends StatelessWidget {
+class ColorVisual {
+  const ColorVisual({required this.nombre, required this.fondo});
+
+  final String nombre;
+  final Color fondo;
+}
+
+class QuizPreguntaColorScreen extends StatefulWidget {
   const QuizPreguntaColorScreen({super.key});
+
+  static const List<ColorVisual> coloresVisuales = [
+    ColorVisual(nombre: 'Blanco', fondo: Color(0xFFF5F5F0)),
+    ColorVisual(nombre: 'Verde', fondo: Color(0xFF7EA172)),
+    ColorVisual(nombre: 'Naranja', fondo: Color(0xFFE76F51)),
+    ColorVisual(nombre: 'Amarillo', fondo: Color(0xFFE9C46A)),
+    ColorVisual(nombre: 'Morado', fondo: Color(0xFF7B2CBF)),
+    ColorVisual(nombre: 'Rojo', fondo: Color(0xFFC85A5A)),
+    ColorVisual(nombre: 'Azul', fondo: Color(0xFF315F9B)),
+  ];
+
+  static int paginaInicial(int indice) {
+    const paginaBase = 1000000;
+    final desplazamiento =
+        (indice - paginaBase % coloresVisuales.length) % coloresVisuales.length;
+    return paginaBase + desplazamiento;
+  }
+
+  static Color fondoParaColor(String color) {
+    return coloresVisuales
+        .firstWhere(
+          (opcion) => opcion.nombre == color,
+          orElse: () => coloresVisuales.first,
+        )
+        .fondo;
+  }
+
+  @override
+  State<QuizPreguntaColorScreen> createState() =>
+      _QuizPreguntaColorScreenState();
+}
+
+class _QuizPreguntaColorScreenState extends State<QuizPreguntaColorScreen> {
+  late final PageController _controladorColores;
+  late int _indiceSeleccionado;
+
+  @override
+  void initState() {
+    super.initState();
+    final colorActual = context.read<BusquedaPlantasProvider>().color;
+    _indiceSeleccionado = QuizPreguntaColorScreen.coloresVisuales.indexWhere(
+      (opcion) => opcion.nombre == colorActual,
+    );
+    if (_indiceSeleccionado < 0) _indiceSeleccionado = 0;
+    _controladorColores = PageController(
+      initialPage: QuizPreguntaColorScreen.paginaInicial(_indiceSeleccionado),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controladorColores.dispose();
+    super.dispose();
+  }
+
+  void _seleccionarColor(int indice) {
+    final indiceColor = indice % QuizPreguntaColorScreen.coloresVisuales.length;
+    if (indiceColor == _indiceSeleccionado) return;
+    setState(() => _indiceSeleccionado = indiceColor);
+    context.read<BusquedaPlantasProvider>().cambiarColor(
+      QuizPreguntaColorScreen.coloresVisuales[indiceColor].nombre,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final busqueda = context.watch<BusquedaPlantasProvider>();
+    final colorSeleccionado =
+        QuizPreguntaColorScreen.coloresVisuales[_indiceSeleccionado];
+    final colorTexto =
+        ThemeData.estimateBrightnessForColor(colorSeleccionado.fondo) ==
+            Brightness.dark
+        ? Colors.white
+        : const Color(0xFF24302A);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 350),
+      curve: Curves.easeInOut,
+      color: colorSeleccionado.fondo,
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Icon(Icons.palette, size: 64),
-          const SizedBox(height: 20),
           Text(
-            '¿Qué color buscas?',
-            style: Theme.of(context).textTheme.headlineSmall,
+            'Color',
+            style: Theme.of(context).textTheme.headlineSmall
+                ?.copyWith(color: colorTexto, fontWeight: FontWeight.w700),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 24),
-          Wrap(
-            alignment: WrapAlignment.center,
-            spacing: 8,
-            runSpacing: 8,
-            children: BusquedaPlantasProvider.colores.map((color) {
-              return ChoiceChip(
-                label: Text(color),
-                selected: busqueda.color == color,
-                onSelected: (_) => busqueda.cambiarColor(color),
-              );
-            }).toList(),
+          Expanded(
+            child: PageView.builder(
+              key: const ValueKey('color-page-view'),
+              controller: _controladorColores,
+              scrollDirection: Axis.vertical,
+              onPageChanged: _seleccionarColor,
+              itemBuilder: (context, indice) {
+                final opcion =
+                    QuizPreguntaColorScreen.coloresVisuales[indice %
+                        QuizPreguntaColorScreen.coloresVisuales.length];
+
+                return Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      opcion.nombre,
+                      style: TextStyle(
+                        color:
+                            ThemeData.estimateBrightnessForColor(
+                                  opcion.fondo,
+                                ) ==
+                                Brightness.dark
+                            ? Colors.white
+                            : const Color(0xFF24302A),
+                        fontSize: 46,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              QuizPreguntaColorScreen.coloresVisuales.length,
+              (indice) => AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: indice == _indiceSeleccionado ? 18 : 7,
+                height: 7,
+                decoration: BoxDecoration(
+                  color: colorTexto.withValues(
+                    alpha: indice == _indiceSeleccionado ? 0.9 : 0.35,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Desliza para elegir un color',
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: colorTexto.withValues(alpha: 0.8)),
+            textAlign: TextAlign.center,
           ),
         ],
       ),

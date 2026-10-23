@@ -31,21 +31,64 @@ void main() {
       ),
     );
 
-    expect(find.text('¿A qué altitud está tu jardín?'), findsOneWidget);
+    expect(find.text('Altitud'), findsOneWidget);
+    expect(find.text('2800 msnm'), findsOneWidget);
+    expect(find.byType(RotatedBox), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                'assets/images/montaña.png',
+      ),
+      findsOneWidget,
+    );
     await tester.tap(find.byTooltip('Mi jardín'));
     expect(jardinPulsado, isTrue);
 
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
-    expect(find.text('¿Qué clima predomina en tu jardín?'), findsOneWidget);
+    expect(find.text('Clima'), findsOneWidget);
+    expect(find.text('Templado'), findsOneWidget);
+    await tester.drag(find.byType(PageView).last, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(find.text('Frío'), findsOneWidget);
+    expect(busqueda.clima, 'Frío');
+    await tester.drag(find.byType(PageView).last, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(busqueda.clima, 'Páramo');
+    await tester.drag(find.byType(PageView).last, const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(busqueda.clima, 'Cálido');
 
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
-    expect(find.text('¿Qué tipo de planta quieres?'), findsOneWidget);
+    expect(find.text('Tipo'), findsOneWidget);
+    expect(find.text('Árbol'), findsOneWidget);
+    expect(find.text('Arbusto'), findsOneWidget);
+    expect(find.text('Hierba'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('tipo-Arbusto')));
+    expect(busqueda.tipoPlanta, 'Arbusto');
 
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
-    expect(find.text('¿Qué color buscas?'), findsOneWidget);
+    expect(find.text('Color'), findsOneWidget);
+    expect(find.text('Blanco'), findsWidgets);
+    await tester.drag(
+      find.byKey(const ValueKey('color-page-view')),
+      const Offset(0, -400),
+    );
+    await tester.pumpAndSettle();
+    expect(busqueda.color, 'Verde');
+    for (var indice = 1; indice < 7; indice++) {
+      await tester.drag(
+        find.byKey(const ValueKey('color-page-view')),
+        const Offset(0, -400),
+      );
+      await tester.pumpAndSettle();
+    }
+    expect(busqueda.color, 'Blanco');
 
     await tester.tap(find.byKey(const ValueKey('quiz-next')));
     await tester.pumpAndSettle();
