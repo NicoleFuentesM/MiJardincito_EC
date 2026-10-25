@@ -6,6 +6,7 @@ class Planta {
   final String tipoClima;
   final String tipoPlanta;
   final String color;
+  final String? imagenAsset;
 
   Planta({
     required this.nombreComun,
@@ -15,6 +16,7 @@ class Planta {
     required this.tipoClima,
     this.tipoPlanta = '',
     this.color = '',
+    this.imagenAsset,
   });
 
   factory Planta.fromJson(Map<String, dynamic> json) {
@@ -26,6 +28,7 @@ class Planta {
       tipoClima: json['tipoClima'] as String? ?? '',
       tipoPlanta: json['tipoPlanta'] as String? ?? '',
       color: json['color'] as String? ?? '',
+      imagenAsset: json['imagenAsset'] as String?,
     );
   }
 }

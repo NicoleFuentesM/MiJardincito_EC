@@ -70,34 +70,38 @@ class _MiJardinVirtualScreenState extends State<MiJardinVirtualScreen> {
         ),
       );
     }
-    return Column(
-      children: [
-        _construirProgreso(jardin),
-        Expanded(
-          child: GridView.builder(
-            padding: const EdgeInsets.all(12),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.72,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+    return ColoredBox(
+      color: const Color(0xFFE8F1DB),
+      child: Column(
+        children: [
+          _construirProgreso(jardin),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(12),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.72,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: jardin.plantas.length,
+              itemBuilder: (context, index) {
+                final planta = jardin.plantas[index];
+                final adoptada = coleccion.estaAdoptada(planta.nombreComun);
+                return _TarjetaJardin(planta: planta, adoptada: adoptada);
+              },
             ),
-            itemCount: jardin.plantas.length,
-            itemBuilder: (context, index) {
-              final planta = jardin.plantas[index];
-              final adoptada = coleccion.estaAdoptada(planta.nombreComun);
-              return _TarjetaJardin(planta: planta, adoptada: adoptada);
-            },
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _construirProgreso(JardinVirtualProvider jardin) {
     final progreso = (jardin.porcentaje / 100).clamp(0.0, 1.0);
     return Card(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      color: Colors.white,
+      margin: const EdgeInsets.fromLTRB(16, 40, 16, 8),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -132,23 +136,57 @@ class _TarjetaJardin extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colores = Theme.of(context).colorScheme;
+
     return Card(
+      color: Colors.white,
       clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              adoptada ? Icons.local_florist : Icons.lock_outline,
-              size: 48,
-              color: adoptada ? Colors.green : Colors.grey,
-            ),
+            if (adoptada)
+              SizedBox(
+                width: 64,
+                height: 64,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: planta.imagenAsset?.trim().isNotEmpty == true
+                      ? Image.asset(
+                          planta.imagenAsset!.trim(),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              ColoredBox(
+                                color: const Color(0xFFDCE9CD),
+                                child: Icon(
+                                  Icons.local_florist,
+                                  color: colores.primary,
+                                ),
+                              ),
+                        )
+                      : ColoredBox(
+                        color: const Color(0xFFDCE9CD),
+                        child: Icon(
+                          Icons.local_florist,
+                          color: colores.primary,
+                        ),
+                      ),
+                ),
+              )
+            else
+              Icon(
+                Icons.lock_outline,
+                size: 48,
+                color: colores.onSurfaceVariant,
+              ),
             const SizedBox(height: 8),
             Text(
               adoptada ? planta.nombreComun : 'Especie por descubrir',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: adoptada ? FontWeight.w600 : FontWeight.bold,
+              ),
             ),
             if (adoptada) ...[
               const SizedBox(height: 4),

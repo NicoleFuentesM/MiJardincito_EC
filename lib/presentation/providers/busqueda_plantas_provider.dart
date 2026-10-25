@@ -14,14 +14,12 @@ class BusquedaPlantasProvider extends ChangeNotifier {
     'Templado': 'Templado',
     'Frío': 'Frio',
     'Páramo': 'Paramo',
-    'Todos': 'Todos',
   };
 
   static const Map<String, String> tipos = {
     'Árbol': 'Arbol',
     'Arbusto': 'Arbusto',
     'Hierba': 'Hierba',
-    'Todos': 'Todos',
   };
 
   static const List<String> colores = [
@@ -32,13 +30,12 @@ class BusquedaPlantasProvider extends ChangeNotifier {
     'Morado',
     'Rojo',
     'Azul',
-    'Todos',
   ];
 
   int _altitud = 2800;
-  String _clima = 'Todos';
-  String _tipoPlanta = 'Todos';
-  String _color = 'Todos';
+  String _clima = 'Templado';
+  String _tipoPlanta = 'Árbol';
+  String _color = 'Blanco';
   List<Planta> _plantas = [];
   bool _cargando = false;
   bool _consultaRealizada = false;
@@ -64,11 +61,17 @@ class BusquedaPlantasProvider extends ChangeNotifier {
   }
 
   void cambiarTipoPlanta(String valor) {
+    if (!tipos.containsKey(valor)) {
+      throw ArgumentError.value(valor, 'valor', 'Tipo de planta no válido');
+    }
     _tipoPlanta = valor;
     notifyListeners();
   }
 
   void cambiarColor(String valor) {
+    if (!colores.contains(valor)) {
+      throw ArgumentError.value(valor, 'valor', 'Color no válido');
+    }
     _color = valor;
     notifyListeners();
   }
