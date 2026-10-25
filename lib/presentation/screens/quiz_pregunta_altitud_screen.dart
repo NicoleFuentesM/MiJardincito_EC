@@ -13,7 +13,7 @@ class QuizPreguntaAltitudScreen extends StatelessWidget {
 
     return Container(
       color: const Color(0xFFF9F8F6),
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 20),
       child: Column(
         children: [
           Text(
@@ -51,28 +51,39 @@ class QuizPreguntaAltitudScreen extends StatelessWidget {
           Expanded(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final alturaSlider = constraints.maxHeight * 0.9;
+                const relacionImagen = 1080 / 806;
+                const anchoSlider = 40.0;
+                const espacioSlider = 8.0;
+                final anchoImagen =
+                    constraints.maxWidth - anchoSlider - espacioSlider;
+                final alturaImagen =
+                    constraints.maxHeight < anchoImagen / relacionImagen
+                    ? constraints.maxHeight
+                    : anchoImagen / relacionImagen;
+                final anchoRenderizado = alturaImagen * relacionImagen;
 
                 return Row(
                   children: [
                     Expanded(
                       child: Center(
-                        child: Image.asset(
-                          'assets/images/montaña.png',
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          height: double.infinity,
+                        child: SizedBox(
+                          width: anchoRenderizado,
+                          height: alturaImagen,
+                          child: Image.asset(
+                            'assets/images/montaña.png',
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: espacioSlider),
                     SizedBox(
-                      width: 48,
+                      width: anchoSlider,
                       child: Center(
                         child: RotatedBox(
                           quarterTurns: 3,
                           child: SizedBox(
-                            width: alturaSlider,
+                            width: alturaImagen,
                             child: SliderTheme(
                               data: SliderTheme.of(context).copyWith(
                                 trackHeight: 3,
@@ -93,7 +104,7 @@ class QuizPreguntaAltitudScreen extends StatelessWidget {
                                 min: 0,
                                 max: 5000,
                                 divisions: 100,
-                                
+
                                 value: busqueda.altitud.toDouble(),
                                 onChanged: busqueda.cambiarAltitud,
                               ),
@@ -111,9 +122,8 @@ class QuizPreguntaAltitudScreen extends StatelessWidget {
           Text(
             'Puedes encontrar la altitud de tu ubicación en el mapa o en la '
             'configuración de tu dispositivo.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: const Color(0xFF697267),
-            ),
+            style: Theme.of(context).textTheme.bodySmall
+                ?.copyWith(color: const Color(0xFF697267)),
             textAlign: TextAlign.center,
           ),
         ],

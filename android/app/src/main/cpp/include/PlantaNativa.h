@@ -12,11 +12,13 @@ private:
     std::string tipoClima;
     std::string tipoPlanta;
     std::string color;
+    std::string imagenAsset;
 
 public:
     PlantaNativa();
     PlantaNativa(std::string nComun, std::string nCientifico, std::string reg,
-                 int alt, std::string clima, std::string tipo, std::string col);
+                 int alt, std::string clima, std::string tipo, std::string col,
+                 std::string imagen);
 
     std::string getNombreComun() const;
     std::string getNombreCientifico() const;
@@ -25,6 +27,7 @@ public:
     std::string getTipoClima() const;
     std::string getTipoPlanta() const;
     std::string getColor() const;
+    std::string getImagenAsset() const;
 
     void mostrarFicha() const;
 };

@@ -56,7 +56,7 @@ void main() {
     final imagenPlanta = tester.widget<Image>(find.byType(Image).first);
     expect(
       (imagenPlanta.image as AssetImage).assetName,
-      'assets/images/arbol.png',
+      'assets/images/Arrayán.png',
     );
     expect(find.byType(GridView), findsOneWidget);
   });
@@ -75,7 +75,7 @@ class _MotorFalso implements MotorJardin {
       'tipoClima': 'Templado',
       'tipoPlanta': 'Árbol',
       'color': 'Blanco',
-      'imagenAsset': 'assets/images/arbol.png',
+      'imagenAsset': 'assets/images/Arrayán.png',
     }),
     Planta.fromJson({
       'nombreComun': 'Chuquiragua',

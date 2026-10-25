@@ -5,7 +5,12 @@ import '../providers/busqueda_plantas_provider.dart';
 import '../widgets/tarjeta_planta.dart';
 
 class QuizResultadoScreen extends StatelessWidget {
-  const QuizResultadoScreen({super.key});
+  const QuizResultadoScreen({
+    required this.onPlantaColeccionada,
+    super.key,
+  });
+
+  final VoidCallback onPlantaColeccionada;
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +77,7 @@ class QuizResultadoScreen extends StatelessWidget {
             for (var indice = 0; indice < busqueda.plantas.length; indice++) ...[
               TarjetaPlanta(
                 planta: busqueda.plantas[indice],
+                onPlantaColeccionada: onPlantaColeccionada,
                 key: ValueKey(busqueda.plantas[indice].nombreComun),
               ),
               if (indice < busqueda.plantas.length - 1)

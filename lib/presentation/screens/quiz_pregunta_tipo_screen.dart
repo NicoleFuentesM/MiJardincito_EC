@@ -13,8 +13,6 @@ class TipoPlantaVisual {
 class QuizPreguntaTipoScreen extends StatelessWidget {
   const QuizPreguntaTipoScreen({super.key});
 
-  static const String _assetPlaceholder = 'assets/images/placeholder.png';
-
   static const List<TipoPlantaVisual> opciones = [
     TipoPlantaVisual(nombre: 'Árbol', asset: 'assets/images/arbol.png'),
     TipoPlantaVisual(nombre: 'Arbusto', asset: 'assets/images/arbusto.png'),
@@ -26,7 +24,6 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
     final busqueda = context.watch<BusquedaPlantasProvider>();
     final colores = Theme.of(context).colorScheme;
     final opciones = QuizPreguntaTipoScreen.opciones;
-    const assetPlaceholder = QuizPreguntaTipoScreen._assetPlaceholder;
 
     return Container(
       color: const Color(0xFFF9F8F6),
@@ -65,7 +62,6 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
                                 seleccionada:
                                     busqueda.tipoPlanta ==
                                     opciones[indice].nombre,
-                                assetPlaceholder: assetPlaceholder,
                                 colorSeleccion: colores.primary,
                                 onTap: () => busqueda.cambiarTipoPlanta(
                                   opciones[indice].nombre,
@@ -85,7 +81,6 @@ class QuizPreguntaTipoScreen extends StatelessWidget {
                             opcion: opciones[2],
                             seleccionada:
                                 busqueda.tipoPlanta == opciones[2].nombre,
-                            assetPlaceholder: assetPlaceholder,
                             colorSeleccion: colores.primary,
                             onTap: () =>
                                 busqueda.cambiarTipoPlanta(opciones[2].nombre),
@@ -108,14 +103,12 @@ class _TarjetaTipoPlanta extends StatelessWidget {
   const _TarjetaTipoPlanta({
     required this.opcion,
     required this.seleccionada,
-    required this.assetPlaceholder,
     required this.colorSeleccion,
     required this.onTap,
   });
 
   final TipoPlantaVisual opcion;
   final bool seleccionada;
-  final String assetPlaceholder;
   final Color colorSeleccion;
   final VoidCallback onTap;
 
@@ -154,14 +147,10 @@ class _TarjetaTipoPlanta extends StatelessWidget {
                 child: Image.asset(
                   opcion.asset,
                   fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Image.asset(
-                    assetPlaceholder,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => Icon(
-                      Icons.eco_outlined,
-                      size: 48,
-                      color: colores.primary,
-                    ),
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    Icons.eco_outlined,
+                    size: 48,
+                    color: colores.primary,
                   ),
                 ),
               ),

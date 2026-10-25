@@ -115,12 +115,14 @@ class _QuizScreenState extends State<QuizScreen> {
                 child: PageView(
                   controller: _controladorPaginas,
                   physics: const NeverScrollableScrollPhysics(),
-                  children: const [
-                    QuizPreguntaAltitudScreen(),
-                    QuizPreguntaClimaScreen(),
-                    QuizPreguntaTipoScreen(),
-                    QuizPreguntaColorScreen(),
-                    QuizResultadoScreen(),
+                  children: [
+                    const QuizPreguntaAltitudScreen(),
+                    const QuizPreguntaClimaScreen(),
+                    const QuizPreguntaTipoScreen(),
+                    const QuizPreguntaColorScreen(),
+                    QuizResultadoScreen(
+                      onPlantaColeccionada: widget.onGardenTap,
+                    ),
                   ],
                 ),
               ),

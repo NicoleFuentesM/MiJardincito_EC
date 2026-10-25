@@ -3,12 +3,14 @@
 
 PlantaNativa::PlantaNativa()
     : nombreComun(""), nombreCientifico(""), region(""), altitudIdeal(0),
-      tipoClima(""), tipoPlanta(""), color("") {}
+      tipoClima(""), tipoPlanta(""), color(""), imagenAsset("") {}
 
 PlantaNativa::PlantaNativa(std::string nComun, std::string nCientifico, std::string reg,
-                           int alt, std::string clima, std::string tipo, std::string col)
+                           int alt, std::string clima, std::string tipo,
+                           std::string col, std::string imagen)
     : nombreComun(nComun), nombreCientifico(nCientifico), region(reg),
-      altitudIdeal(alt), tipoClima(clima), tipoPlanta(tipo), color(col) {}
+      altitudIdeal(alt), tipoClima(clima), tipoPlanta(tipo), color(col),
+      imagenAsset(imagen) {}
 
 std::string PlantaNativa::getNombreComun() const { return nombreComun; }
 std::string PlantaNativa::getNombreCientifico() const { return nombreCientifico; }
@@ -17,6 +19,7 @@ int PlantaNativa::getAltitudIdeal() const { return altitudIdeal; }
 std::string PlantaNativa::getTipoClima() const { return tipoClima; }
 std::string PlantaNativa::getTipoPlanta() const { return tipoPlanta; }
 std::string PlantaNativa::getColor() const { return color; }
+std::string PlantaNativa::getImagenAsset() const { return imagenAsset; }
 
 void PlantaNativa::mostrarFicha() const {
     std::cout << "Nombre Comun: " << nombreComun << "\n"

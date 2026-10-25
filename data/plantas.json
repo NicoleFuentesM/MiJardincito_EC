@@ -6,7 +6,8 @@
     "altitudIdeal": 2800,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbol",
-    "color": "Blanco"
+    "color": "Blanco",
+    "imagenAsset": "assets/images/Arrayán.png"
   },
   {
     "nombreComun": "Pumamaqui",
@@ -15,7 +16,8 @@
     "altitudIdeal": 2800,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbol",
-    "color": "Verde"
+    "color": "Verde",
+    "imagenAsset": "assets/images/Pumamaqui.png"
   },
   {
     "nombreComun": "Chuquiragua",
@@ -24,7 +26,8 @@
     "altitudIdeal": 3500,
     "tipoClima": "Frio",
     "tipoPlanta": "Arbusto",
-    "color": "Naranja"
+    "color": "Naranja",
+    "imagenAsset": "assets/images/Chuquiragua.png"
   },
   {
     "nombreComun": "Chilca",
@@ -33,7 +36,8 @@
     "altitudIdeal": 2600,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbusto",
-    "color": "Amarillo"
+    "color": "Amarillo",
+    "imagenAsset": "assets/images/Chilca.png"
   },
   {
     "nombreComun": "Arupo",
@@ -42,7 +46,8 @@
     "altitudIdeal": 2500,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbol",
-    "color": "Morado"
+    "color": "Morado",
+    "imagenAsset": "assets/images/Arupo.png"
   },
   {
     "nombreComun": "Guanto / Floripondio",
@@ -51,7 +56,8 @@
     "altitudIdeal": 2400,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbusto",
-    "color": "Blanco"
+    "color": "Blanco",
+    "imagenAsset": "assets/images/Guanto.png"
   },
   {
     "nombreComun": "Yagual / Polylepis",
@@ -60,7 +66,8 @@
     "altitudIdeal": 3800,
     "tipoClima": "Frio",
     "tipoPlanta": "Arbol",
-    "color": "Rojo"
+    "color": "Rojo",
+    "imagenAsset": "assets/images/Polylepis.png"
   },
   {
     "nombreComun": "Gentiana de Paramo",
@@ -69,7 +76,8 @@
     "altitudIdeal": 3900,
     "tipoClima": "Frio",
     "tipoPlanta": "Hierba",
-    "color": "Azul"
+    "color": "Azul",
+    "imagenAsset": "assets/images/Gentiana.png"
   },
   {
     "nombreComun": "Mortiño",
@@ -78,7 +86,8 @@
     "altitudIdeal": 3400,
     "tipoClima": "Frio",
     "tipoPlanta": "Arbusto",
-    "color": "Morado"
+    "color": "Morado",
+    "imagenAsset": "assets/images/Mortiño.png"
   },
   {
     "nombreComun": "Fucsia Silvestre",
@@ -87,6 +96,7 @@
     "altitudIdeal": 2700,
     "tipoClima": "Templado",
     "tipoPlanta": "Arbusto",
-    "color": "Rojo"
+    "color": "Rojo",
+    "imagenAsset": "assets/images/Fucsia.png"
   }
 ]

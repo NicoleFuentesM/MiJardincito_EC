@@ -35,15 +35,19 @@ void main() {
     expect(find.byKey(const ValueKey('quiz-back')), findsOneWidget);
     expect(find.text('2800 msnm'), findsOneWidget);
     expect(find.byType(RotatedBox), findsOneWidget);
+    final imagenMontana = find.byWidgetPredicate(
+      (widget) =>
+          widget is Image &&
+          widget.image is AssetImage &&
+          (widget.image as AssetImage).assetName == 'assets/images/montaña.png',
+    );
     expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is Image &&
-            widget.image is AssetImage &&
-            (widget.image as AssetImage).assetName ==
-                'assets/images/montaña.png',
-      ),
+      imagenMontana,
       findsOneWidget,
+    );
+    expect(
+      tester.getSize(imagenMontana).height,
+      tester.getSize(find.byType(RotatedBox).first).height,
     );
     await tester.tap(find.byTooltip('Mi jardín'));
     expect(jardinPulsado, isTrue);
@@ -105,13 +109,25 @@ void main() {
 
     expect(find.text('Plantas compatibles'), findsOneWidget);
     expect(find.text('Arrayán'), findsNWidgets(2));
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is Image &&
+            widget.image is AssetImage &&
+            (widget.image as AssetImage).assetName ==
+                'assets/images/Arrayán.png',
+      ),
+      findsOneWidget,
+    );
     expect(motor.busquedaRealizada, isTrue);
 
     await tester.ensureVisible(find.text('¡Coleccionar!'));
     await tester.pumpAndSettle();
+    jardinPulsado = false;
     await tester.tap(find.text('¡Coleccionar!'));
     await tester.pumpAndSettle();
     expect(coleccion.nombresAdoptados, ['Arrayán']);
+    expect(jardinPulsado, isTrue);
   });
 }
 
@@ -133,6 +149,7 @@ class _MotorBusquedaFalso implements MotorJardin {
         region: 'Andes',
         altitudIdeal: altitud,
         tipoClima: clima,
+        imagenAsset: 'assets/images/Arrayán.png',
       ),
     ];
   }

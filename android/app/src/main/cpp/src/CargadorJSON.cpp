@@ -23,8 +23,11 @@ void CargadorJSON::cargarPlantas(Jardincito& jardin, const std::string& rutaArch
         std::string clima = item.value("tipoClima", "");
         std::string tipo = item.value("tipoPlanta", "");
         std::string color = item.value("color", "");
+        std::string imagen = item.value("imagenAsset", "");
 
-        PlantaNativa planta(nComun, nCientifico, region, altitud, clima, tipo, color);
+        PlantaNativa planta(
+            nComun, nCientifico, region, altitud, clima, tipo, color, imagen
+        );
         jardin.agregarPlanta(planta);
     }
 }
@@ -42,8 +45,11 @@ void CargadorJSON::cargarPlantasDesdeString(Jardincito& jardin, const std::strin
             std::string clima = item.value("tipoClima", "");
             std::string tipo = item.value("tipoPlanta", "");
             std::string color = item.value("color", "");
+            std::string imagen = item.value("imagenAsset", "");
 
-            PlantaNativa planta(nComun, nCientifico, region, altitud, clima, tipo, color);
+            PlantaNativa planta(
+                nComun, nCientifico, region, altitud, clima, tipo, color, imagen
+            );
             jardin.agregarPlanta(planta);
         }
     } catch (const json::parse_error& e) {

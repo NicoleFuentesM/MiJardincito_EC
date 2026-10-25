@@ -5,10 +5,14 @@ import '../../models/planta.dart';
 import '../providers/coleccion_plantas_provider.dart';
 
 class TarjetaPlanta extends StatelessWidget {
-  const TarjetaPlanta({required this.planta, super.key});
+  const TarjetaPlanta({
+    required this.planta,
+    this.onPlantaColeccionada,
+    super.key,
+  });
 
   final Planta planta;
-  static const String _imagenPlaceholder = 'assets/images/placeholder.png';
+  final VoidCallback? onPlantaColeccionada;
 
   @override
   Widget build(BuildContext context) {
@@ -48,14 +52,9 @@ class TarjetaPlanta extends StatelessWidget {
                     padding: const EdgeInsets.all(3),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(13),
-                      child: Image.asset(
-                        planta.imagenAsset?.trim().isNotEmpty == true
-                            ? planta.imagenAsset!
-                            : _imagenPlaceholder,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            Image.asset(
-                              _imagenPlaceholder,
+                      child: planta.imagenAsset?.trim().isNotEmpty == true
+                          ? Image.asset(
+                              planta.imagenAsset!.trim(),
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) =>
                                   ColoredBox(
@@ -66,8 +65,15 @@ class TarjetaPlanta extends StatelessWidget {
                                       color: colores.primary,
                                     ),
                                   ),
+                            )
+                          : ColoredBox(
+                              color: const Color(0xFFDCE9CD),
+                              child: Icon(
+                                Icons.local_florist,
+                                size: 72,
+                                color: colores.primary,
+                              ),
                             ),
-                      ),
                     ),
                   ),
                 );
@@ -131,7 +137,12 @@ class TarjetaPlanta extends StatelessWidget {
               child: FilledButton.tonalIcon(
                 onPressed: adoptada || coleccion.cargando
                     ? null
-                    : () => coleccion.adoptar(planta.nombreComun),
+                    : () async {
+                        await coleccion.adoptar(planta.nombreComun);
+                        if (coleccion.estaAdoptada(planta.nombreComun)) {
+                          onPlantaColeccionada?.call();
+                        }
+                      },
                 icon: Icon(adoptada ? Icons.check : Icons.yard),
                 label: Text(adoptada ? 'Adoptada' : '¡Coleccionar!'),
                 style: FilledButton.styleFrom(

@@ -46,6 +46,7 @@ const char* obtenerPlantasCompatiblesAvanzadoJSON(
         item["tipoClima"] = planta.getTipoClima();
         item["tipoPlanta"] = planta.getTipoPlanta();
         item["color"] = planta.getColor();
+        item["imagenAsset"] = planta.getImagenAsset();
 
         // Recalcular puntaje específico de esta planta para la UI de Flutter
         double score = 0.0;

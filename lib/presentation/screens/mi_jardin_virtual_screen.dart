@@ -131,8 +131,6 @@ class _MiJardinVirtualScreenState extends State<MiJardinVirtualScreen> {
 class _TarjetaJardin extends StatelessWidget {
   const _TarjetaJardin({required this.planta, required this.adoptada});
 
-  static const String _imagenPlaceholder = 'assets/images/placeholder.png';
-
   final Planta planta;
   final bool adoptada;
 
@@ -154,23 +152,26 @@ class _TarjetaJardin extends StatelessWidget {
                 height: 64,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    planta.imagenAsset?.trim().isNotEmpty == true
-                        ? planta.imagenAsset!.trim()
-                        : _imagenPlaceholder,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Image.asset(
-                      _imagenPlaceholder,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => ColoredBox(
+                  child: planta.imagenAsset?.trim().isNotEmpty == true
+                      ? Image.asset(
+                          planta.imagenAsset!.trim(),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                              ColoredBox(
+                                color: const Color(0xFFDCE9CD),
+                                child: Icon(
+                                  Icons.local_florist,
+                                  color: colores.primary,
+                                ),
+                              ),
+                        )
+                      : ColoredBox(
                         color: const Color(0xFFDCE9CD),
                         child: Icon(
                           Icons.local_florist,
                           color: colores.primary,
                         ),
                       ),
-                    ),
-                  ),
                 ),
               )
             else
